@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>WELCOME PAGE</title>
+</head>
+<body>
+<h1>Welcome to the Contract Management System!</h1>
+{{range .}}
+<p>{{.ID}} - {{.SigningEntity}} - {{.CounterpartyName}} - {{.Business}} - {{.Requester}}</p>
+{{end}}
+<form method="post">
+    <input type="text" name="contractrequestid" placeholder="Key in request ID"><br>
+    <input type="text" name="approvereject" placeholder="Key in 'Approve' or 'Reject'"><br>
+    <input type="submit">
+</form>
+<h2><a href="/directory">Home page</a></h2>
+<h2><a href="/logout">Log Out</a></h2>
+</body>
+</html>

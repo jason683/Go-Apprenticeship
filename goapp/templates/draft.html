@@ -1,0 +1,22 @@
+<!-- template form is taken from https://tutorialedge.net/golang/go-file-upload-tutorial/-->
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Upload contract</title>
+</head>
+<body>
+
+<h1>Please upload the contract</h1>
+<form 
+    enctype="multipart/form-data"
+    action="https://127.0.0.1:5000/upload"
+    method="POST"
+>
+    <input type="file" name="myFile"/>
+    <input type="submit" value="upload"/>
+</form>
+
+<h2>Or <a href="/signup">Sign Up</a> if you do not have an account</h2>
+</body>
+</html>

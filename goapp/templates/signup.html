@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Create Account</title>
+</head>
+<body>
+<h1>Create New Account</h1>
+<h3>Enter the following to create a new account</h3>
+<form method="post">
+    <div>
+        {{ with .input1}}
+        <p>{{ . }}</p>
+        {{ end }}
+    </div>
+    <div>
+        {{ with .input2}}
+        <p>{{ . }}</p>
+        {{ end }}
+    </div>
+    <div>
+        {{ with .input3}}
+        <p>{{ . }}</p>
+        {{ end }}
+    </div>
+    <div>
+        {{ with .input5}}
+        <p>{{ . }}</p>
+        {{ end }}
+    </div>
+ <label for ="username">Username:</label>
+ <input type="text" name="username" placeholder="username"><br>
+ <div>
+    {{ with .input4}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<div>
+    {{ with .input6}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+ <label for ="password">Password:</label>
+ <input type="password" name="password" autocomplete="off" placeholder="password"><br>
+ <div>
+    {{ with .input7}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<div>
+    {{ with .input9}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+ <label for ="firstname">First Name:</label>
+ <input type="text" name="firstname" placeholder="first name"><br>
+ <div>
+    {{ with .input8}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<div>
+    {{ with .input10}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+ <label for ="lastname">Last Name:</label>
+ <input type="text" name="lastname" placeholder="last name"><br>
+ <div>
+    {{ with .input11}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+ <label for ="email">Email:</label>
+ <input type="text" name="email" placeholder="email"><br>
+ <input type="submit">
+</form>
+
+<h2><a href="/">Click here to return to the home page</a></h2>
+</body>
+</html>
