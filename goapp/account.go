@@ -23,7 +23,7 @@ func getUser(res http.ResponseWriter, req *http.Request) staff {
 	//without this section, the program will panic
 	myCookie, err := req.Cookie("myCookie")
 	if err != nil {
-		id, _ := uuid.NewV4()
+		id := uuid.NewV4()
 		myCookie = &http.Cookie{
 			Name:     "myCookie",
 			Value:    id.String(),
@@ -200,7 +200,7 @@ func signup(res http.ResponseWriter, req *http.Request) {
 			panic(err.Error())
 		}
 		//Set cookie process
-		id, _ := uuid.NewV4()
+		id := uuid.NewV4()
 		expireTime := time.Now().Add(30 * time.Minute)
 		myCookie := &http.Cookie{
 			Name:     "myCookie",
@@ -268,7 +268,7 @@ func login(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 		//create a new cookie session once the user manages to login
-		id, _ := uuid.NewV4()
+		id := uuid.NewV4()
 		expireTime := time.Now().Add(30 * time.Minute)
 		myCookie := &http.Cookie{
 			Name:     "myCookie",

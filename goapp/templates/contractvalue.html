@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Contract Management System</title>
+</head>
+<body>
+<h1>Contract Value</h1>
+{{range .}}
+<p>{{.ID}} - {{.SigningEntity}} - {{.CounterpartyName}} - {{.Business}} - {{.Value}}</p>
+{{end}}
+<form method="post">
+    <label for ="contractrequestid">Contract Request ID</label>
+    <input type="text" name="contractrequestid" placeholder="Key in request ID"><br>
+    <label for ="signatory">Signatory involved?</label>
+    <input type="text" name="signatory" placeholder="Key in 'yes' or 'no'"><br>
+    <input type="submit">
+</form>
+<h2><a href="/directory">Home page</a></h2>
+<h2><a href="/logout">Log Out</a></h2>
+</body>
+</html>

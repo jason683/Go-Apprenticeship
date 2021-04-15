@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -36,12 +35,13 @@ func init() {
 }
 
 func main() {
-	var databaseUser string
-	databaseUser = os.Getenv("DATABASEUSER")
-	var databasePW string
-	databasePW = os.Getenv("DATABASEPW")
-	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/items_db", databaseUser, databasePW)
-	db, err = sql.Open("mysql", databaseString)
+	db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/contracts_db")
+	// var databaseUser string
+	// databaseUser = os.Getenv("DATABASEUSER")
+	// var databasePW string
+	// databasePW = os.Getenv("DATABASEPW")
+	// databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/items_db", databaseUser, databasePW)
+	// db, err = sql.Open("mysql", databaseString)
 	if err != nil {
 		panic(err.Error())
 	} else {
@@ -63,5 +63,3 @@ func main() {
 	fmt.Println("Listening at port 5000")
 	http.ListenAndServeTLS(":5000", "cert.pem", "key.pem", router)
 }
-
-// test

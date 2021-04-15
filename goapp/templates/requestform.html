@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
  <meta charset="UTF-8">
- <title>LOGIN</title>
+ <title>Request Form</title>
 </head>
 <body>
 
@@ -12,6 +12,17 @@
  <input type="text" name="counterpartyname" placeholder="Counterparty Name"><br>
  <input type="text" name="business" placeholder="Business"><br>
  <input type="text" name="businessowner" placeholder="Business Owner"><br>
+ <div>
+    {{ with .input1}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+ <input type="text" name="contractvalue" placeholder="Contract Value"><br>
+ <div>
+    {{ with .input0}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
  <input type="submit">
 </form>
 <h2>Or <a href="/signup">Sign Up</a> if you do not have an account</h2>

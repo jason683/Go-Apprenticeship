@@ -15,8 +15,6 @@ type contractRequest struct {
 	Requester        string
 }
 
-// example changes
-
 func reviewRequest(res http.ResponseWriter, req *http.Request) {
 	if !alreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
