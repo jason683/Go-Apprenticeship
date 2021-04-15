@@ -58,6 +58,8 @@ func main() {
 	router.HandleFunc("/reviewrequest", reviewRequest)
 	router.HandleFunc("/fintax", financeTax)
 	router.HandleFunc("/upload", uploadFile)
+	router.HandleFunc("/reviewcontractvalue", valueApproval)
+	router.HandleFunc("/showcontracts", showContracts)
 	fmt.Println("Listening at port 5000")
 	http.ListenAndServeTLS(":5000", "cert.pem", "key.pem", router)
 }
