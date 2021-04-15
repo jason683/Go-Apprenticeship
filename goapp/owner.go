@@ -15,7 +15,7 @@ type contractRequest struct {
 	Requester        string
 }
 
-// example changes
+// different code
 
 func reviewRequest(res http.ResponseWriter, req *http.Request) {
 	if !alreadyLoggedIn(req) {
