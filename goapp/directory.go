@@ -31,6 +31,11 @@ func directory(res http.ResponseWriter, req *http.Request) {
 		tpl.ExecuteTemplate(res, "directory.html", mapTypeRights)
 		delete(mapTypeRights, "financetax")
 		return
+	} else if myUser.Rights == "contractadmin" {
+		mapTypeRights["contractadmin"] = "hello contract admin"
+		tpl.ExecuteTemplate(res, "directory.html", mapTypeRights)
+		delete(mapTypeRights, "contractadmin")
+		return
 	} else {
 		tpl.ExecuteTemplate(res, "directory.html", mapTypeRights)
 	}
