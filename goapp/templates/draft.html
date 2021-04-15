@@ -6,17 +6,21 @@
  <title>Upload contract</title>
 </head>
 <body>
-
-<h1>Please upload the contract</h1>
+<h1>Welcome to the Contract Management System!</h1>
+{{range .}}
+<p>{{.ID}} - {{.SigningEntity}} - {{.CounterpartyName}} - {{.Business}} - {{.Requester}}</p>
+{{end}}
+<h2>Please upload the contract</h2>
 <form 
     enctype="multipart/form-data"
     action="https://127.0.0.1:5000/upload"
     method="POST"
 >
     <input type="file" name="myFile"/>
+    <input type="text" name="contractrequestid" placeholder="Key in contract ID"><br>
     <input type="submit" value="upload"/>
 </form>
 
-<h2>Or <a href="/signup">Sign Up</a> if you do not have an account</h2>
+<h3>Or <a href="/signup">Sign Up</a> if you do not have an account</h3>
 </body>
 </html>
