@@ -11,6 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// HELLo
+
 func start(res http.ResponseWriter, req *http.Request) {
 	//this will retrieve the staff information and display it on the webpage
 	myUser := getUser(res, req)

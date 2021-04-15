@@ -4,6 +4,8 @@ import (
 	"net/http"
 )
 
+//directory
+
 func directory(res http.ResponseWriter, req *http.Request) {
 	if !alreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
