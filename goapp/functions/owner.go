@@ -1,4 +1,4 @@
-package main
+package functions
 
 import (
 	"fmt"
@@ -15,13 +15,14 @@ type contractRequest struct {
 	Requester        string
 }
 
-func reviewRequest(res http.ResponseWriter, req *http.Request) {
-	if !alreadyLoggedIn(req) {
+//ReviewRequest is to be exported
+func ReviewRequest(res http.ResponseWriter, req *http.Request) {
+	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 		return
 	}
-	myUser := getUser(res, req)
-	results, err := db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE BusinessOwner = ? AND ApproveStatus ='Pending'", myUser.Username)
+	myUser := GetUser(res, req)
+	results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE BusinessOwner = ? AND ApproveStatus ='Pending'", myUser.Username)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -36,7 +37,7 @@ func reviewRequest(res http.ResponseWriter, req *http.Request) {
 		display = append(display, reviewRequest)
 	}
 	if req.Method == http.MethodPost {
-		if !alreadyLoggedIn(req) {
+		if !AlreadyLoggedIn(req) {
 			http.Redirect(res, req, "/", http.StatusSeeOther)
 		}
 		contractRequestIDstring := req.FormValue("contractrequestid")
@@ -51,7 +52,7 @@ func reviewRequest(res http.ResponseWriter, req *http.Request) {
 				lowercaseContractRequestStatus := strings.ToLower(contractRequestStatus)
 				if lowercaseContractRequestStatus == "approve" || lowercaseContractRequestStatus == "reject" {
 					query := fmt.Sprintf("UPDATE Contracts SET ApproveStatus='%s' WHERE Id='%s'", contractRequestStatus, contractRequestIDstring)
-					_, err := db.Query(query)
+					_, err := Db.Query(query)
 					if err != nil {
 						panic(err.Error())
 					}
@@ -60,5 +61,5 @@ func reviewRequest(res http.ResponseWriter, req *http.Request) {
 		}
 		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
-	tpl.ExecuteTemplate(res, "revrequest.html", display)
+	Tpl.ExecuteTemplate(res, "revrequest.html", display)
 }

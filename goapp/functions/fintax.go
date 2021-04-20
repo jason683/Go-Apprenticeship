@@ -1,4 +1,4 @@
-package main
+package functions
 
 import (
 	"fmt"
@@ -7,14 +7,15 @@ import (
 	"strings"
 )
 
-func financeTax(res http.ResponseWriter, req *http.Request) {
-	if !alreadyLoggedIn(req) {
+//FinanceTax to be exported
+func FinanceTax(res http.ResponseWriter, req *http.Request) {
+	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 		return
 	}
-	myUser := getUser(res, req)
+	myUser := GetUser(res, req)
 	if myUser.Rights == "financetax" {
-		results, err := db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE FinanceTax = 'Pending'")
+		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE FinanceTax = 'Pending'")
 		if err != nil {
 			panic(err.Error())
 		}
@@ -29,7 +30,7 @@ func financeTax(res http.ResponseWriter, req *http.Request) {
 			display = append(display, reviewRequest)
 		}
 		if req.Method == http.MethodPost {
-			if !alreadyLoggedIn(req) {
+			if !AlreadyLoggedIn(req) {
 				http.Redirect(res, req, "/", http.StatusSeeOther)
 			}
 			contractRequestIDstring := req.FormValue("contractrequestid")
@@ -44,7 +45,7 @@ func financeTax(res http.ResponseWriter, req *http.Request) {
 					lowercaseContractRequestStatus := strings.ToLower(contractRequestStatus)
 					if lowercaseContractRequestStatus == "approve" || lowercaseContractRequestStatus == "reject" {
 						query := fmt.Sprintf("UPDATE Contracts SET FinanceTax='%s' WHERE Id='%s'", contractRequestStatus, contractRequestIDstring)
-						_, err := db.Query(query)
+						_, err := Db.Query(query)
 						if err != nil {
 							panic(err.Error())
 						}
@@ -53,7 +54,7 @@ func financeTax(res http.ResponseWriter, req *http.Request) {
 			}
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
-		tpl.ExecuteTemplate(res, "financetax.html", display)
+		Tpl.ExecuteTemplate(res, "financetax.html", display)
 	} else {
 		fmt.Fprintf(res, "You are not authorised to view this page")
 	}

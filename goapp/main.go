@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Apprentice/Go-Apprenticeship/goapp/functions"
 	"database/sql"
 	"fmt"
 	"html/template"
@@ -10,56 +11,36 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type empty interface{}
-
-type staff struct {
-	Username string
-	Password []byte
-	First    string
-	Last     string
-	Email    string
-	Rights   string
-}
-
-var (
-	db            *sql.DB
-	err           error
-	mapUsers      = map[string]staff{}
-	mapSessions   = map[string]string{}
-	mapTypeRights = map[string]string{}
-	tpl           *template.Template
-)
-
 func init() {
-	tpl = template.Must(template.ParseGlob("templates/*"))
+	functions.Tpl = template.Must(template.ParseGlob("templates/*"))
 }
 
 func main() {
-	db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/contracts_db")
+	functions.Db, functions.Err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/contracts_db")
 	// var databaseUser string
 	// databaseUser = os.Getenv("DATABASEUSER")
 	// var databasePW string
 	// databasePW = os.Getenv("DATABASEPW")
 	// databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/items_db", databaseUser, databasePW)
 	// db, err = sql.Open("mysql", databaseString)
-	if err != nil {
-		panic(err.Error())
+	if functions.Err != nil {
+		panic(functions.Err.Error())
 	} else {
 		fmt.Println("Database opened!")
 	}
-	defer db.Close()
+	defer functions.Db.Close()
 	router := mux.NewRouter()
-	router.HandleFunc("/", start)
-	router.HandleFunc("/signup", signup)
-	router.HandleFunc("/login", login)
-	router.HandleFunc("/logout", logout)
-	router.HandleFunc("/directory", directory)
-	router.HandleFunc("/createrequest", createRequest)
-	router.HandleFunc("/reviewrequest", reviewRequest)
-	router.HandleFunc("/fintax", financeTax)
-	router.HandleFunc("/upload", uploadFile)
-	router.HandleFunc("/reviewcontractvalue", valueApproval)
-	router.HandleFunc("/showcontracts", showContracts)
+	router.HandleFunc("/", functions.Start)
+	router.HandleFunc("/signup", functions.Signup)
+	router.HandleFunc("/login", functions.Login)
+	router.HandleFunc("/logout", functions.Logout)
+	router.HandleFunc("/directory", functions.Directory)
+	router.HandleFunc("/createrequest", functions.CreateRequest)
+	router.HandleFunc("/reviewrequest", functions.ReviewRequest)
+	router.HandleFunc("/fintax", functions.FinanceTax)
+	router.HandleFunc("/upload", functions.UploadFile)
+	router.HandleFunc("/reviewcontractvalue", functions.ValueApproval)
+	router.HandleFunc("/showcontracts", functions.ShowContracts)
 	fmt.Println("Listening at port 5000")
 	http.ListenAndServeTLS(":5000", "cert.pem", "key.pem", router)
 }

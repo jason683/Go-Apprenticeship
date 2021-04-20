@@ -1,4 +1,4 @@
-package main
+package cert
 
 import (
 	"crypto/rand"
@@ -12,13 +12,14 @@ import (
 	"time"
 )
 
-func main() {
+//Cert to be exported
+func Cert() {
 	max := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, _ := rand.Int(rand.Reader, max)
 	subject := pkix.Name{
-		Organization:       []string{"Shopee"},
-		OrganizationalUnit: []string{"Shopee"},
-		CommonName:         "Shopee",
+		Organization:       []string{"SEA Group"},
+		OrganizationalUnit: []string{"SEA Group"},
+		CommonName:         "SEA Group",
 	}
 
 	template := x509.Certificate{

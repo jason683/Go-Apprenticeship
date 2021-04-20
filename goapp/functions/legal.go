@@ -1,4 +1,4 @@
-package main
+package functions
 
 import (
 	"fmt"
@@ -7,13 +7,13 @@ import (
 	"strconv"
 )
 
-// parts of the function taken from https://tutorialedge.net/golang/go-file-upload-tutorial/
-func uploadFile(res http.ResponseWriter, req *http.Request) {
-	if !alreadyLoggedIn(req) {
+//UploadFile : parts of the function taken from https://tutorialedge.net/golang/go-file-upload-tutorial/
+func UploadFile(res http.ResponseWriter, req *http.Request) {
+	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 	}
 
-	results, err := db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE ApproveStatus='Approve'")
+	results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE ApproveStatus='Approve'")
 	if err != nil {
 		fmt.Println("Something has happened")
 	}
@@ -63,7 +63,7 @@ func uploadFile(res http.ResponseWriter, req *http.Request) {
 		for _, v := range display {
 			if v.ID == contractRequestIDint {
 				query := fmt.Sprintf("UPDATE Contracts SET Contract = '%s' WHERE ID='%s'", filepath, contractRequestIDstring)
-				_, err := db.Query(query)
+				_, err := Db.Query(query)
 				if err != nil {
 					fmt.Println("Unable to update Contracts database")
 				}
@@ -71,5 +71,5 @@ func uploadFile(res http.ResponseWriter, req *http.Request) {
 		}
 		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
-	tpl.ExecuteTemplate(res, "draft.html", display)
+	Tpl.ExecuteTemplate(res, "draft.html", display)
 }

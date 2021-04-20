@@ -1,4 +1,4 @@
-package main
+package functions
 
 import (
 	"fmt"
@@ -6,12 +6,13 @@ import (
 	"strconv"
 )
 
-func createRequest(res http.ResponseWriter, req *http.Request) {
-	if !alreadyLoggedIn(req) {
+//CreateRequest to be exported
+func CreateRequest(res http.ResponseWriter, req *http.Request) {
+	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 		return
 	}
-	myUser := getUser(res, req)
+	myUser := GetUser(res, req)
 	if req.Method == http.MethodPost {
 		errorMessage := map[string]string{}
 
@@ -23,7 +24,7 @@ func createRequest(res http.ResponseWriter, req *http.Request) {
 		financeTax := "Pending"
 		if signingEntity == "" || counterpartyName == "" || business == "" || businessOwner == "" {
 			errorMessage["input1"] = "Did you miss out entering any fields?"
-			tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
+			Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
 			delete(errorMessage, "input1")
 			return
 		}
@@ -31,7 +32,7 @@ func createRequest(res http.ResponseWriter, req *http.Request) {
 		_, err := strconv.Atoi(contractValue)
 		if err != nil {
 			errorMessage["input0"] = "Contract value has to be an integer"
-			tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
+			Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
 			delete(errorMessage, "input0")
 			return
 		}
@@ -39,12 +40,12 @@ func createRequest(res http.ResponseWriter, req *http.Request) {
 		//NULL can be used to circumvent the int auto increment in sql
 		query := fmt.Sprintf("INSERT INTO Contracts VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', NULL)", signingEntity, counterpartyName, business, myUser.Username, businessOwner, approveStatus, financeTax, contractValue)
 		fmt.Println("test")
-		_, err = db.Query(query)
+		_, err = Db.Query(query)
 		if err != nil {
 			fmt.Println("Hello world")
 		}
 		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		return
 	}
-	tpl.ExecuteTemplate(res, "requestform.html", nil)
+	Tpl.ExecuteTemplate(res, "requestform.html", nil)
 }

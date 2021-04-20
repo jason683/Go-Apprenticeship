@@ -1,4 +1,4 @@
-package main
+package functions
 
 import (
 	"fmt"
@@ -15,14 +15,15 @@ type valueRequest struct {
 	Value            string
 }
 
-func valueApproval(res http.ResponseWriter, req *http.Request) {
-	if !alreadyLoggedIn(req) {
+//ValueApproval to be exported
+func ValueApproval(res http.ResponseWriter, req *http.Request) {
+	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 		return
 	}
-	myUser := getUser(res, req)
+	myUser := GetUser(res, req)
 	if myUser.Rights == "contractadmin" {
-		results, err := db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, ContractValue FROM contracts_db.Contracts WHERE ContractValue IS NOT NULL AND FinanceTax = 'Pending' AND SeniorFinance IS NULL")
+		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, ContractValue FROM contracts_db.Contracts WHERE ContractValue IS NOT NULL AND FinanceTax = 'Pending' AND SeniorFinance IS NULL")
 		if err != nil {
 			fmt.Println("Something has happened")
 		}
@@ -51,7 +52,7 @@ func valueApproval(res http.ResponseWriter, req *http.Request) {
 					lowercaseSignatory := strings.ToLower(signatory)
 					if lowercaseSignatory == "yes" {
 						query := fmt.Sprintf("UPDATE Contracts SET SeniorFinance='%s' WHERE Id='%s'", signatory, contractRequestIDstring)
-						_, err := db.Query(query)
+						_, err := Db.Query(query)
 						if err != nil {
 							fmt.Println("Unable to update database in relation to signatories")
 						}
@@ -60,7 +61,7 @@ func valueApproval(res http.ResponseWriter, req *http.Request) {
 			}
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
-		tpl.ExecuteTemplate(res, "contractvalue.html", display)
+		Tpl.ExecuteTemplate(res, "contractvalue.html", display)
 	} else {
 		fmt.Fprintf(res, "You are not authorised to view this page")
 	}
