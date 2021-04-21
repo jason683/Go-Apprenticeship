@@ -22,6 +22,7 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 		businessOwner := req.FormValue("businessowner")
 		approveStatus := "Pending"
 		financeTax := "Pending"
+		signed := "Pending"
 		if signingEntity == "" || counterpartyName == "" || business == "" || businessOwner == "" {
 			errorMessage["input1"] = "Did you miss out entering any fields?"
 			Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
@@ -38,7 +39,7 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 		}
 
 		//NULL can be used to circumvent the int auto increment in sql
-		query := fmt.Sprintf("INSERT INTO Contracts VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', NULL)", signingEntity, counterpartyName, business, myUser.Username, businessOwner, approveStatus, financeTax, contractValue)
+		query := fmt.Sprintf("INSERT INTO Contracts VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', NULL, '%s')", signingEntity, counterpartyName, business, myUser.Username, businessOwner, approveStatus, financeTax, contractValue, signed)
 		fmt.Println("test")
 		_, err = Db.Query(query)
 		if err != nil {

@@ -27,6 +27,9 @@
 <a href="/reviewcontractvalue"><p>Review contract value</p></a>
 <a href="/contractsignature"><p>Check for signatories</p></a>
 {{end}}
+{{ with .signatory}}
+<a href="/showcontracts"><p>Show/Upload contracts</p></a>
+{{end}}
 <h2><a href="/">Home page</a></h2>
 <h2><a href="/logout">Log Out</a></h2>
 </body>

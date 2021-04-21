@@ -9,12 +9,21 @@
 <h1>Welcome to the Contract Management System!</h1>
 <h2>List of files to be downloaded and signed</h2>
 {{range .}}
-<a href="{{.}}">{{.}}</a>
+<table>
+    <tr>
+        <th>Contract Id</th>
+        <th>Download Link</th>    
+    </tr>
+    <tr>
+        <td>{{.ID}}</td>
+        <td><a href="file://smu/Desktop/Go/go/src/Apprentice/Go-Apprenticeship/goapp/{{.}}">{{.Contract}}</a></td>
+    </tr>
+</table>
 {{end}}
 <h3>Please upload the contract</h3>
 <form 
     enctype="multipart/form-data"
-    action="https://127.0.0.1:5000/upload"
+    action="https://127.0.0.1:5000/showcontracts"
     method="POST"
 >
     <input type="file" name="myFile"/>
