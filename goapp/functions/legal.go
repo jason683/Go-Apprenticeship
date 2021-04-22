@@ -62,13 +62,15 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 
 		for _, v := range display {
 			if v.ID == contractRequestIDint {
-				query := fmt.Sprintf("UPDATE Contracts SET Contract = '%s' WHERE ID='%s'", filepath, contractRequestIDstring)
+				query := fmt.Sprintf("UPDATE Contracts SET Contract = '%s', Archived = 'Pending' WHERE ID='%s'", filepath, contractRequestIDstring)
 				_, err := Db.Query(query)
 				if err != nil {
 					fmt.Println("Unable to update Contracts database")
 				}
 			}
 		}
+
+		SendEmail("testtechnology.93@gmail.com")
 		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 	Tpl.ExecuteTemplate(res, "draft.html", display)

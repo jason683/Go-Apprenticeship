@@ -39,12 +39,13 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 		}
 
 		//NULL can be used to circumvent the int auto increment in sql
-		query := fmt.Sprintf("INSERT INTO Contracts VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', NULL, '%s')", signingEntity, counterpartyName, business, myUser.Username, businessOwner, approveStatus, financeTax, contractValue, signed)
+		query := fmt.Sprintf("INSERT INTO Contracts VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', NULL, '%s', NULL)", signingEntity, counterpartyName, business, myUser.Username, businessOwner, approveStatus, financeTax, contractValue, signed)
 		fmt.Println("test")
 		_, err = Db.Query(query)
 		if err != nil {
 			fmt.Println("Hello world")
 		}
+		SendEmail("testtechnology.93@gmail.com")
 		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		return
 	}

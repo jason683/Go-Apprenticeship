@@ -2,6 +2,7 @@ package functions
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,6 +14,11 @@ type valueRequest struct {
 	CounterpartyName string
 	Business         string
 	Value            string
+}
+
+type finalisedContract struct {
+	ID       int
+	Contract string
 }
 
 //ValueApproval to be exported
@@ -59,10 +65,57 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 					}
 				}
 			}
+			SendEmail("testtechnology.93@gmail.com")
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "contractvalue.html", display)
 	} else {
 		fmt.Fprintf(res, "You are not authorised to view this page")
 	}
+}
+
+//ArchiveContract is to be exported
+func ArchiveContract(res http.ResponseWriter, req *http.Request) {
+	if !AlreadyLoggedIn(req) {
+		http.Redirect(res, req, "/", http.StatusSeeOther)
+		return
+	}
+	myUser := GetUser(res, req)
+	if myUser.Rights == "contractadmin" {
+		results, err := Db.Query("SELECT Id, Contract FROM contracts_db.Contracts WHERE Archived = 'Pending' AND Finalised = 'Signed'")
+		if err != nil {
+			log.Fatal(err)
+		}
+		display := []finalisedContract{}
+		var contract finalisedContract
+		for results.Next() {
+			err := results.Scan(&contract.ID, &contract.Contract)
+			if err != nil {
+				fmt.Println("Unable to scan into contract variable")
+			}
+			display = append(display, contract)
+		}
+
+		if req.Method == http.MethodPost {
+			contractRequestIDstring := req.FormValue("contractrequestid")
+			contractRequestIDint, err := strconv.Atoi(contractRequestIDstring)
+			if err != nil {
+				fmt.Println("invalid, unapproved or no contract ID")
+			}
+			for _, v := range display {
+				if v.ID == contractRequestIDint {
+					query := fmt.Sprintf("UPDATE Contracts SET Archived = 'Yes' WHERE Id='%s'", contractRequestIDstring)
+					_, err := Db.Query(query)
+					if err != nil {
+						fmt.Println("Unable to update database column 'Archived' to 'Yes'")
+					}
+				}
+			}
+			http.Redirect(res, req, "/directory", http.StatusSeeOther)
+		}
+		Tpl.ExecuteTemplate(res, "archivecontract.html", display)
+	} else {
+		fmt.Fprintf(res, "You are not authorised to view this page.")
+	}
+
 }

@@ -52,6 +52,7 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 					}
 				}
 			}
+			SendEmail("testtechnology.93@gmail.com")
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "financetax.html", display)

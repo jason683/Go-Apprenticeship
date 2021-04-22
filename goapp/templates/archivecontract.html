@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Upload signed contract</title>
+</head>
+<body>
+<h1>Welcome to the Contract Management System!</h1>
+<h2>File(s) to be archived</h2>
+{{range .}}
+<table>
+    <tr>
+        <th>Contract Id</th>
+        <th>Download Link</th>    
+    </tr>
+    <tr>
+        <td>{{.ID}}</td>
+        <td><a href="file://smu/Desktop/Go/go/src/Apprentice/Go-Apprenticeship/goapp/{{.}}">{{.Contract}}</a></td>
+    </tr>
+</table>
+{{end}}
+<form method="post">
+    <label for ="contractrequestid">Please key in the contract Id that you have archived</label>
+    <input type="text" name="contractrequestid" placeholder="Contract ID"><br>
+    <input type="submit" value="Archive">
+</form>
+<h2><a href="/directory">Home page</a></h2>
+<h2><a href="/logout">Log Out</a></h2>
+</body>
+</html>
