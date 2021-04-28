@@ -8,8 +8,9 @@ import (
 )
 
 type contract struct {
-	ID       int
-	Contract string
+	ID            int
+	Contract      string
+	SeniorFinance string
 }
 
 //ShowContracts is to be exported
@@ -21,7 +22,7 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 	myUser := GetUser(res, req)
 	if myUser.Rights == "signatory" {
 		//to add on new column (signed?)
-		results, err := Db.Query("SELECT Id, Contract FROM contracts_db.Contracts WHERE SeniorFinance ='yes' AND Contract IS NOT NULL")
+		results, err := Db.Query("SELECT Id, Contract, SeniorFinance FROM contracts_db.Contracts WHERE Finalised = 'Pending' AND Contract IS NOT NULL")
 		if err != nil {
 			fmt.Println("Cannot extract contract file")
 		}
@@ -29,7 +30,7 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 		display := []contract{}
 		var row contract
 		for results.Next() {
-			err := results.Scan(&row.ID, &row.Contract)
+			err := results.Scan(&row.ID, &row.Contract, &row.SeniorFinance)
 			if err != nil {
 				fmt.Println("Cannot scan into row")
 			}
@@ -71,7 +72,7 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 			for _, v := range display {
 				if v.ID == contractRequestIDint {
 					signed := "Signed"
-					query := fmt.Sprintf("UPDATE Contracts SET Contract = '%s', Finalised = '%s' WHERE ID='%s'", filepath, signed, contractRequestIDstring)
+					query := fmt.Sprintf("UPDATE Contracts SET Contract = '%s', Finalised = '%s', Archived = 'Pending' WHERE ID='%s'", filepath, signed, contractRequestIDstring)
 					_, err := Db.Query(query)
 					if err != nil {
 						fmt.Println("Unable to update Contracts database")

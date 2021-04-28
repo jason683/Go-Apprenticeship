@@ -12,11 +12,13 @@
 <table>
     <tr>
         <th>Contract Id</th>
-        <th>Download Link</th>    
+        <th>Download Link</th> 
+        <th>Senior Finance Approval Required</th>   
     </tr>
     <tr>
         <td>{{.ID}}</td>
         <td><a href="file://smu/Desktop/Go/go/src/Apprentice/Go-Apprenticeship/goapp/{{.}}">{{.Contract}}</a></td>
+        <td>{{.SeniorFinance}}</td>
     </tr>
 </table>
 {{end}}

@@ -25,7 +25,7 @@ func main() {
 	}
 	databaseUser := os.Getenv("DATABASEUSER")
 	databasePW := os.Getenv("DATABASEPW")
-	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/contracts_db", databaseUser, databasePW)
+	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/contracts_db?parseTime=true", databaseUser, databasePW)
 	functions.Db, functions.Err = sql.Open("mysql", databaseString)
 	if functions.Err != nil {
 		panic(functions.Err.Error())
@@ -46,6 +46,8 @@ func main() {
 	router.HandleFunc("/reviewcontractvalue", functions.ValueApproval)
 	router.HandleFunc("/showcontracts", functions.ShowContracts)
 	router.HandleFunc("/archive", functions.ArchiveContract)
+	router.HandleFunc("/outdated", functions.IdentifyOutdatedRequest)
+	router.HandleFunc("/emaillist", functions.EmailList)
 	fmt.Println("Listening at port 5000")
 
 	http.ListenAndServeTLS(":5000", "cert.pem", "key.pem", router)

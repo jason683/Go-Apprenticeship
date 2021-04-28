@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 //CreateRequest to be exported
@@ -12,6 +13,7 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 		return
 	}
+
 	myUser := GetUser(res, req)
 	if req.Method == http.MethodPost {
 		errorMessage := map[string]string{}
@@ -38,13 +40,14 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		timeAction := time.Now().Format(time.RFC3339)
 		//NULL can be used to circumvent the int auto increment in sql
-		query := fmt.Sprintf("INSERT INTO Contracts VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', NULL, '%s', NULL)", signingEntity, counterpartyName, business, myUser.Username, businessOwner, approveStatus, financeTax, contractValue, signed)
-		fmt.Println("test")
+		query := fmt.Sprintf("INSERT INTO Contracts VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', NULL, '%s', NULL, '%s', NULL)", signingEntity, counterpartyName, business, myUser.Username, businessOwner, approveStatus, financeTax, contractValue, signed, timeAction)
 		_, err = Db.Query(query)
 		if err != nil {
-			fmt.Println("Hello world")
+			fmt.Println(err)
 		}
+
 		SendEmail("testtechnology.93@gmail.com")
 		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		return

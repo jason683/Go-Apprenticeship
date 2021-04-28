@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Outdated contract details</title>
+</head>
+<body>
+<h1>Welcome to the Contract Management System!</h1>
+<h2>List of outdated contract requests</h2>
+{{range .}}
+<table>
+    <tr>
+        <th>Contract Id</th>
+        <th>Business Owner</th> 
+        <th>Business Owner Approve Status</th> 
+        <th>Contract uploaded by Legal Status</th>  
+        <th>Finance & Tax Approve Status</th>
+        <th>Finalised Status</th>
+        <th>Archived Status</th>
+    </tr>
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.BusinessOwner}}</td>
+        <td>{{.ApproveStatus}}</td>
+        <td><a href="file://smu/Desktop/Go/go/src/Apprentice/Go-Apprenticeship/goapp/{{.}}">{{.Contract}}</a></td>
+        <td>{{.FinanceTax}}</td>
+        <td>{{.Finalised}}</td>
+        <td>{{.Archived}}</td>
+    </tr>
+</table>
+{{end}}
+
+<h4><a href="/emaillist">Click here</a>for the list of user emails for you to send a reminder to.</h4>
+<h4>Or <a href="/signup">Sign Up</a> if you do not have an account</h4>
+
+</body>
+</html>

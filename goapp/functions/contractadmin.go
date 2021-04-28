@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type valueRequest struct {
@@ -19,6 +20,21 @@ type valueRequest struct {
 type finalisedContract struct {
 	ID       int
 	Contract string
+}
+
+type timing struct {
+	ID     int
+	Timing time.Time
+}
+
+type row struct {
+	ID            int
+	BusinessOwner string
+	ApproveStatus string
+	Contract      string
+	FinanceTax    string
+	Finalised     string
+	Archived      string
 }
 
 //ValueApproval to be exported
@@ -57,7 +73,7 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 				if v.ID == contractRequestIDint {
 					lowercaseSignatory := strings.ToLower(signatory)
 					if lowercaseSignatory == "yes" {
-						query := fmt.Sprintf("UPDATE Contracts SET SeniorFinance='%s' WHERE Id='%s'", signatory, contractRequestIDstring)
+						query := fmt.Sprintf("UPDATE Contracts SET SeniorFinance='%s', Finalised='Pending' WHERE Id='%s'", signatory, contractRequestIDstring)
 						_, err := Db.Query(query)
 						if err != nil {
 							fmt.Println("Unable to update database in relation to signatories")
@@ -117,5 +133,102 @@ func ArchiveContract(res http.ResponseWriter, req *http.Request) {
 	} else {
 		fmt.Fprintf(res, "You are not authorised to view this page.")
 	}
+}
 
+//IdentifyOutdatedRequest is to be exported
+func IdentifyOutdatedRequest(res http.ResponseWriter, req *http.Request) {
+	if !AlreadyLoggedIn(req) {
+		http.Redirect(res, req, "/", http.StatusSeeOther)
+		return
+	}
+	myUser := GetUser(res, req)
+	if myUser.Rights == "contractadmin" {
+		results, err := Db.Query("SELECT ID, ActionTime FROM Contracts WHERE Archived IS NOT NULL AND Archived != 'Yes'")
+		if err != nil {
+			fmt.Println(err)
+		}
+		display := []timing{}
+		var lastDone timing
+		for results.Next() {
+			err := results.Scan(&lastDone.ID, &lastDone.Timing)
+			if err != nil {
+				fmt.Println(err)
+			}
+			display = append(display, lastDone)
+		}
+
+		for _, v := range display {
+			//if more than 7 days
+			if time.Now().Sub(v.Timing).Hours() >= 168 {
+				_, err := Db.Query(fmt.Sprintf("UPDATE Contracts SET Outdated = 'Yes' WHERE ID = '%v'", v.ID))
+				if err != nil {
+					fmt.Println(err)
+				}
+				//Tpl.ExecuteTemplate(res, "reminder.html", display)
+			} else {
+				_, err := Db.Query(fmt.Sprintf("UPDATE Contracts SET Outdated = 'No' WHERE ID = '%v'", v.ID))
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+		}
+
+		displaySecond := []row{}
+		var contract row
+		dbquery, err := Db.Query("SELECT Id, BusinessOwner, ApproveStatus, Contract, FinanceTax, Finalised, Archived FROM Contracts WHERE Outdated = 'Yes'")
+		if err != nil {
+			fmt.Println(err)
+		}
+		for dbquery.Next() {
+			err := dbquery.Scan(&contract.ID, &contract.BusinessOwner, &contract.ApproveStatus, &contract.Contract, &contract.FinanceTax, &contract.Finalised, &contract.Archived)
+			if err != nil {
+				fmt.Println(err)
+			}
+			displaySecond = append(displaySecond, contract)
+		}
+		Tpl.ExecuteTemplate(res, "outdatedcontract.html", displaySecond)
+
+	} else {
+		fmt.Fprintf(res, "You are not authorised to view this page")
+	}
+}
+
+//EmailList is to be exported
+func EmailList(res http.ResponseWriter, req *http.Request) {
+	if !AlreadyLoggedIn(req) {
+		http.Redirect(res, req, "/", http.StatusSeeOther)
+		return
+	}
+
+	myUser := GetUser(res, req)
+	if myUser.Rights == "contractadmin" {
+		dbquery, err := Db.Query("SELECT Email FROM Users")
+		if err != nil {
+			fmt.Println(err)
+		}
+		var email string
+		emailList := []string{}
+		for dbquery.Next() {
+			err := dbquery.Scan(&email)
+			if err != nil {
+				fmt.Println(err)
+			}
+			emailList = append(emailList, email)
+		}
+
+		if req.Method == http.MethodPost {
+			email := req.FormValue("email")
+			for _, v := range emailList {
+				if v == email {
+					SendEmail(v)
+					http.Redirect(res, req, "/directory", http.StatusSeeOther)
+				}
+			}
+			fmt.Fprintf(res, "No valid email was found.")
+		}
+
+		Tpl.ExecuteTemplate(res, "emaillist.html", emailList)
+	} else {
+		fmt.Fprintf(res, "You are not authorised to view this page")
+	}
 }
