@@ -15,7 +15,7 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 	}
 	myUser := GetUser(res, req)
 	if myUser.Rights == "financetax" {
-		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE FinanceTax = 'Pending'")
+		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, ContractType, Requester FROM contracts_db.Contracts WHERE FinanceTax = 'Pending'")
 		if err != nil {
 			panic(err.Error())
 		}
@@ -23,7 +23,7 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 		display := []contractRequest{}
 		var reviewRequest contractRequest
 		for results.Next() {
-			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.Business, &reviewRequest.Requester)
+			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.ContractType, &reviewRequest.Requester)
 			if err != nil {
 				panic(err.Error())
 			}

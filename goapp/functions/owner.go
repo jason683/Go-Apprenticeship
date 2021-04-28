@@ -11,7 +11,7 @@ type contractRequest struct {
 	ID               int
 	SigningEntity    string
 	CounterpartyName string
-	Business         string
+	ContractType     string
 	Requester        string
 }
 
@@ -22,7 +22,7 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	myUser := GetUser(res, req)
-	results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE BusinessOwner = ? AND ApproveStatus ='Pending'", myUser.Username)
+	results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, ContractType, Requester FROM contracts_db.Contracts WHERE BusinessOwner = ? AND ApproveStatus ='Pending'", myUser.Username)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -30,7 +30,7 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 	display := []contractRequest{}
 	var reviewRequest contractRequest
 	for results.Next() {
-		err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.Business, &reviewRequest.Requester)
+		err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.ContractType, &reviewRequest.Requester)
 		if err != nil {
 			panic(err.Error())
 		}

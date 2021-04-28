@@ -13,7 +13,7 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 	}
 
-	results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, Requester FROM contracts_db.Contracts WHERE ApproveStatus='Approve'")
+	results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, ContractType, Requester FROM contracts_db.Contracts WHERE ApproveStatus='Approve'")
 	if err != nil {
 		fmt.Println("Something has happened")
 	}
@@ -21,7 +21,7 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 	display := []contractRequest{}
 	var request contractRequest
 	for results.Next() {
-		err := results.Scan(&request.ID, &request.SigningEntity, &request.CounterpartyName, &request.Business, &request.Requester)
+		err := results.Scan(&request.ID, &request.SigningEntity, &request.CounterpartyName, &request.ContractType, &request.Requester)
 		if err != nil {
 			fmt.Println("Something has happened in request variable")
 		}

@@ -33,6 +33,7 @@ var (
 	mapUsers      = map[string]Staff{}
 	mapSessions   = map[string]string{}
 	mapTypeRights = map[string]string{}
+	mapBusiness   = map[string]string{}
 	//Tpl is to be exported
 	Tpl *template.Template
 )

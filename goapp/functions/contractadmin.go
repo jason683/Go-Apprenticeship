@@ -13,7 +13,7 @@ type valueRequest struct {
 	ID               int
 	SigningEntity    string
 	CounterpartyName string
-	Business         string
+	ContractType     string
 	Value            string
 }
 
@@ -45,7 +45,7 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 	}
 	myUser := GetUser(res, req)
 	if myUser.Rights == "contractadmin" {
-		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, ContractValue FROM contracts_db.Contracts WHERE ContractValue IS NOT NULL AND FinanceTax = 'Pending' AND SeniorFinance IS NULL")
+		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, ContractType, ContractValue FROM contracts_db.Contracts WHERE ContractValue IS NOT NULL AND FinanceTax = 'Pending' AND SeniorFinance IS NULL")
 		if err != nil {
 			fmt.Println("Something has happened")
 		}
@@ -53,7 +53,7 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 		display := []valueRequest{}
 		var reviewRequest valueRequest
 		for results.Next() {
-			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.Business, &reviewRequest.Value)
+			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.ContractType, &reviewRequest.Value)
 			if err != nil {
 				fmt.Println("Unable to scan into reviewRequest variable")
 			}

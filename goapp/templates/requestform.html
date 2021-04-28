@@ -10,8 +10,31 @@
 <form method="post">
  <input type="text" name="signingentity" placeholder="Signing Entity"><br>
  <input type="text" name="counterpartyname" placeholder="Counterparty Name"><br>
- <input type="text" name="business" placeholder="Business"><br>
+
+ <select name="business">
+     <option disabled selected value="">Business</option>
+     <option value="{{.}}">{{.first}}</option>
+     <option value="{{.}}">{{.second}}</option>
+ </select>
+ <input type="text" name="newbusiness" placeholder="New business type (optional)"><br>
+
+ <div>
+    {{ with .nobusiness}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+
+<div>
+    {{ with .duplicatebusiness}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+
+ <input type="text" name="contracttype" placeholder="Contract Type"><br>
  <input type="text" name="businessowner" placeholder="Business Owner"><br>
+
+ <input type="text" name="businessowner" placeholder="Business Owner"><br>
+
  <div>
     {{ with .input1}}
     <p>{{ . }}</p>
@@ -23,6 +46,7 @@
     <p>{{ . }}</p>
     {{ end }}
 </div>
+
  <input type="submit">
 </form>
 <h2>Or <a href="/signup">Sign Up</a> if you do not have an account</h2>
