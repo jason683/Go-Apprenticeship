@@ -25,12 +25,18 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 			signingEntity := req.FormValue("signingentity")
 			counterpartyName := req.FormValue("counterpartyname")
 			business := req.FormValue("business")
-			contractType := req.FormValue("contracttype")
-			businessOwner := req.FormValue("businessowner")
 			newBusiness := req.FormValue("newbusiness")
+			contractType := req.FormValue("contracttype")
+			contractValue := req.FormValue("contractvalue")
+			region := req.FormValue("region")
+			effectiveDate := req.FormValue("effectivedate")
+			terminationDate := req.FormValue("terminationdate")
+			backgroundPurpose := req.FormValue("backgroundpurpose")
+			counterpartyContactInfo := req.FormValue("counterpartycontactinfo")
+
+			businessOwner := req.FormValue("businessowner")
 			approveStatus := "Pending"
-			financeTax := "Pending"
-			signed := "Pending"
+
 			if signingEntity == "" || counterpartyName == "" || contractType == "" || businessOwner == "" {
 				errorMessage["input1"] = "Did you miss out entering any fields?"
 				Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
@@ -49,7 +55,6 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 				delete(errorMessage, "duplicatebusiness")
 				return
 			}
-			contractValue := req.FormValue("contractvalue")
 			_, err := strconv.Atoi(contractValue)
 			if err != nil {
 				errorMessage["input0"] = "Contract value has to be an integer"
@@ -60,13 +65,13 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 
 			timeAction := time.Now().Format(time.RFC3339)
 			//NULL can be used to circumvent the int auto increment in sql
-			query := fmt.Sprintf("INSERT INTO Contracts VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', NULL, '%s', NULL, '%s', NULL)", signingEntity, counterpartyName, business, contractType, myUser.Username, businessOwner, approveStatus, financeTax, contractValue, signed, timeAction)
-			_, err = Db.Query(query)
+			Query := fmt.Sprintf("INSERT INTO Contracts (SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester, BusinessOwner, ApproveStatus, ActionTime) VALUES ('%s', '%s', '%s', '%s', '%v', '%s', '%v', '%v', '%s', '%s', '%s', '%s', '%s', '%s')", signingEntity, counterpartyName, business, contractType, contractValue, region, effectiveDate, terminationDate, backgroundPurpose, counterpartyContactInfo, myUser.Username, businessOwner, approveStatus, timeAction)
+			_, err = Db.Query(Query)
 			if err != nil {
 				fmt.Println(err)
 			}
 
-			SendEmail("testtechnology.93@gmail.com")
+			//SendEmail("testtechnology.93@gmail.com")
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 			return
 		}

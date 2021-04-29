@@ -6,12 +6,51 @@
 </head>
 <body>
 <h1>Welcome to the Contract Management System!</h1>
-{{range .}}
-<p>{{.ID}} - {{.SigningEntity}} - {{.CounterpartyName}} - {{.Business}} - {{.Requester}}</p>
+<table>
+    <tr>
+        <th>Request ID</th>
+        <th>Requester User</th>
+        <th>Signing Entity</th>
+        <th>CounterpartyName</th>
+        <th>Business</th>
+        <th>Contract Type</th>
+        <th>Contract Value</th>
+        <th>Region</th>
+        <th>Effective Date</th>
+        <th>Termination Date</th>
+        <th>Background/Purpose<th>
+        <th>Counterparty Contact Info</th>
+    </tr>
+    {{range .}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Requester}}</td>
+        <td>{{.SigningEntity}}</td>
+        <td>{{.CounterpartyName}}</td>
+        <td>{{.Business}}</td>
+        <td>{{.ContractType}}</td>
+        <td>{{.ContractValue}}</td>
+        <td>{{.Region}}</td>
+        <td>{{.EffectiveDate}}</td>
+        <td>{{.TerminationDate}}</td>
+        <td>{{.BackgroundPurpose}}</td>
+        <td>{{.CounterpartyContactInfo}}</td><br>
+    </tr>
+</table>
 {{end}}
+<br>
 <form method="post">
-    <input type="text" name="contractrequestid" placeholder="Key in request ID"><br>
-    <input type="text" name="approvereject" placeholder="Key in 'Approve' or 'Reject'"><br>
+    <select name="contractrequestid">
+        <option disabled selected value="">Enter request ID</option>
+        {{range .}}
+        <option value="{{.ID}}">{{.ID}}</option>
+        {{end}}
+    </select><br>
+    <select name="approvereject">
+        <option disabled selected value="">Choose an option</option>
+        <option value="Approve">Approve</option>
+        <option value="Reject">Reject</option>
+    </select><br>
     <input type="submit">
 </form>
 <h2><a href="/directory">Home page</a></h2>

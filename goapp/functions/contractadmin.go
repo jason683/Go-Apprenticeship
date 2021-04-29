@@ -9,14 +9,6 @@ import (
 	"time"
 )
 
-type valueRequest struct {
-	ID               int
-	SigningEntity    string
-	CounterpartyName string
-	ContractType     string
-	Value            string
-}
-
 type finalisedContract struct {
 	ID       int
 	Contract string
@@ -45,17 +37,17 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 	}
 	myUser := GetUser(res, req)
 	if myUser.Rights == "contractadmin" {
-		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, ContractType, ContractValue FROM contracts_db.Contracts WHERE ContractValue IS NOT NULL AND FinanceTax = 'Pending' AND SeniorFinance IS NULL")
+		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester FROM contracts_db.Contracts WHERE ContractValue IS NOT NULL AND FinanceTax = 'Approve' AND SeniorFinance IS NULL")
 		if err != nil {
-			fmt.Println("Something has happened")
+			fmt.Println(err)
 		}
 		//display variable will contain a list of all unapproved contract requests in relation to their contract value
-		display := []valueRequest{}
-		var reviewRequest valueRequest
+		display := []contractRequest{}
+		var reviewRequest contractRequest
 		for results.Next() {
-			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.ContractType, &reviewRequest.Value)
+			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.Business, &reviewRequest.ContractType, &reviewRequest.ContractValue, &reviewRequest.Region, &reviewRequest.EffectiveDate, &reviewRequest.TerminationDate, &reviewRequest.BackgroundPurpose, &reviewRequest.CounterpartyContactInfo, &reviewRequest.Requester)
 			if err != nil {
-				fmt.Println("Unable to scan into reviewRequest variable")
+				fmt.Println(err)
 			}
 			display = append(display, reviewRequest)
 		}

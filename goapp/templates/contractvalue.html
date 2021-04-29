@@ -6,14 +6,54 @@
 </head>
 <body>
 <h1>Contract Value</h1>
-{{range .}}
-<p>{{.ID}} - {{.SigningEntity}} - {{.CounterpartyName}} - {{.Business}} - {{.Value}}</p>
+<table>
+    <tr>
+        <th>Request ID</th>
+        <th>Requester User</th>
+        <th>Signing Entity</th>
+        <th>CounterpartyName</th>
+        <th>Business</th>
+        <th>Contract Type</th>
+        <th>Contract Value</th>
+        <th>Region</th>
+        <th>Effective Date</th>
+        <th>Termination Date</th>
+        <th>Background/Purpose<th>
+        <th>Counterparty Contact Info</th>
+    </tr>
+    {{range .}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Requester}}</td>
+        <td>{{.SigningEntity}}</td>
+        <td>{{.CounterpartyName}}</td>
+        <td>{{.Business}}</td>
+        <td>{{.ContractType}}</td>
+        <td>{{.ContractValue}}</td>
+        <td>{{.Region}}</td>
+        <td>{{.EffectiveDate}}</td>
+        <td>{{.TerminationDate}}</td>
+        <td>{{.BackgroundPurpose}}</td>
+        <td>{{.CounterpartyContactInfo}}</td><br>
+    </tr>
+</table>
 {{end}}
+<br>
+
 <form method="post">
     <label for ="contractrequestid">Contract Request ID</label>
-    <input type="text" name="contractrequestid" placeholder="Key in request ID"><br>
+    <select name="contractrequestid">
+        <option disabled selected value="">Enter request ID</option>
+        {{range .}}
+        <option value="{{.ID}}">{{.ID}}</option>
+        {{end}}
+    </select><br>
     <label for ="signatory">Signatory involved?</label>
-    <input type="text" name="signatory" placeholder="Key in 'yes' or 'no'"><br>
+    <select name="signatory">
+        <option disabled selected value="">Choose an option</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+    </select><br>
     <input type="submit">
 </form>
 <h2><a href="/directory">Home page</a></h2>

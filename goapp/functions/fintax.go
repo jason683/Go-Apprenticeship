@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //FinanceTax to be exported
@@ -15,17 +16,17 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 	}
 	myUser := GetUser(res, req)
 	if myUser.Rights == "financetax" {
-		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, ContractType, Requester FROM contracts_db.Contracts WHERE FinanceTax = 'Pending'")
+		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester FROM contracts_db.Contracts WHERE FinanceTax = 'Pending'")
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err)
 		}
 		//display variable will contain a list of all the pending contract requests
 		display := []contractRequest{}
 		var reviewRequest contractRequest
 		for results.Next() {
-			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.ContractType, &reviewRequest.Requester)
+			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.Business, &reviewRequest.ContractType, &reviewRequest.ContractValue, &reviewRequest.Region, &reviewRequest.EffectiveDate, &reviewRequest.TerminationDate, &reviewRequest.BackgroundPurpose, &reviewRequest.CounterpartyContactInfo, &reviewRequest.Requester)
 			if err != nil {
-				panic(err.Error())
+				fmt.Println(err)
 			}
 			display = append(display, reviewRequest)
 		}
@@ -36,7 +37,7 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 			contractRequestIDstring := req.FormValue("contractrequestid")
 			contractRequestIDint, err := strconv.Atoi(contractRequestIDstring)
 			if err != nil {
-				panic(err.Error())
+				fmt.Println(err)
 			}
 			//section below will change pending status to either approve or reject status
 			contractRequestStatus := req.FormValue("approvereject")
@@ -44,15 +45,16 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 				if v.ID == contractRequestIDint {
 					lowercaseContractRequestStatus := strings.ToLower(contractRequestStatus)
 					if lowercaseContractRequestStatus == "approve" || lowercaseContractRequestStatus == "reject" {
-						query := fmt.Sprintf("UPDATE Contracts SET FinanceTax='%s' WHERE Id='%s'", contractRequestStatus, contractRequestIDstring)
+						actionTime := time.Now().Format(time.RFC3339)
+						query := fmt.Sprintf("UPDATE Contracts SET FinanceTax='%s', ActionTime='%s' WHERE Id='%s'", contractRequestStatus, actionTime, contractRequestIDstring)
 						_, err := Db.Query(query)
 						if err != nil {
-							panic(err.Error())
+							fmt.Println(err)
 						}
 					}
 				}
 			}
-			SendEmail("testtechnology.93@gmail.com")
+			//SendEmail("testtechnology.93@gmail.com")
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "financetax.html", display)
