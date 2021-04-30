@@ -46,15 +46,25 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 					lowercaseContractRequestStatus := strings.ToLower(contractRequestStatus)
 					if lowercaseContractRequestStatus == "approve" || lowercaseContractRequestStatus == "reject" {
 						actionTime := time.Now().Format(time.RFC3339)
-						query := fmt.Sprintf("UPDATE Contracts SET FinanceTax='%s', ActionTime='%s' WHERE Id='%s'", contractRequestStatus, actionTime, contractRequestIDstring)
-						_, err := Db.Query(query)
+						_, err := Db.Query("UPDATE Contracts SET FinanceTax=?, ActionTime=? WHERE Id=?", contractRequestStatus, actionTime, contractRequestIDstring)
 						if err != nil {
 							fmt.Println(err)
 						}
 					}
 				}
 			}
-			//SendEmail("testtechnology.93@gmail.com")
+			emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'legal'")
+			if err != nil {
+				fmt.Println(err)
+			}
+			var email string
+			for emailAddress.Next() {
+				err := emailAddress.Scan(&email)
+				if err != nil {
+					fmt.Println(err)
+				}
+				SendEmail(email)
+			}
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "financetax.html", display)

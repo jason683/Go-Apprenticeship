@@ -25,7 +25,6 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 			signingEntity := req.FormValue("signingentity")
 			counterpartyName := req.FormValue("counterpartyname")
 			business := req.FormValue("business")
-			newBusiness := req.FormValue("newbusiness")
 			contractType := req.FormValue("contracttype")
 			contractValue := req.FormValue("contractvalue")
 			region := req.FormValue("region")
@@ -33,6 +32,7 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 			terminationDate := req.FormValue("terminationdate")
 			backgroundPurpose := req.FormValue("backgroundpurpose")
 			counterpartyContactInfo := req.FormValue("counterpartycontactinfo")
+			others := req.FormValue("others")
 
 			businessOwner := req.FormValue("businessowner")
 			approveStatus := "Pending"
@@ -43,35 +43,55 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 				delete(errorMessage, "input1")
 				return
 			}
-			if business == "" && newBusiness == "" {
+			if business == "" && others == "" {
 				errorMessage["nobusiness"] = "You have not entered any value for the business field"
 				Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
 				delete(errorMessage, "nobusiness")
 				return
 			}
-			if newBusiness != "" && business != "" {
-				errorMessage["duplicatebusiness"] = "You have entered values for both business fields"
-				Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
-				delete(errorMessage, "duplicatebusiness")
-				return
+			if contractValue != "" {
+				_, err := strconv.Atoi(contractValue)
+				if err != nil {
+					errorMessage["input0"] = "Contract value has to be an integer"
+					Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
+					delete(errorMessage, "input0")
+					return
+				}
 			}
-			_, err := strconv.Atoi(contractValue)
-			if err != nil {
-				errorMessage["input0"] = "Contract value has to be an integer"
-				Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
-				delete(errorMessage, "input0")
-				return
+			if contractValue == "" {
+				contractValue = "0"
 			}
-
+			if backgroundPurpose == "" {
+				backgroundPurpose = "NA"
+			}
+			if region == "" {
+				region = "NA"
+			}
+			if terminationDate == "" {
+				terminationDate = "0001-01-01"
+			}
+			if counterpartyContactInfo == "" {
+				counterpartyContactInfo = "NA"
+			}
 			timeAction := time.Now().Format(time.RFC3339)
 			//NULL can be used to circumvent the int auto increment in sql
-			Query := fmt.Sprintf("INSERT INTO Contracts (SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester, BusinessOwner, ApproveStatus, ActionTime) VALUES ('%s', '%s', '%s', '%s', '%v', '%s', '%v', '%v', '%s', '%s', '%s', '%s', '%s', '%s')", signingEntity, counterpartyName, business, contractType, contractValue, region, effectiveDate, terminationDate, backgroundPurpose, counterpartyContactInfo, myUser.Username, businessOwner, approveStatus, timeAction)
-			_, err = Db.Query(Query)
+			_, err := Db.Query("INSERT INTO Contracts (SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester, BusinessOwner, ApproveStatus, ActionTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", signingEntity, counterpartyName, business, contractType, contractValue, region, effectiveDate, terminationDate, backgroundPurpose, counterpartyContactInfo, myUser.Username, businessOwner, approveStatus, timeAction)
 			if err != nil {
 				fmt.Println(err)
 			}
 
-			//SendEmail("testtechnology.93@gmail.com")
+			// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Username = ?", businessOwner)
+			// if err != nil {
+			// 	fmt.Println(err)
+			// }
+			// var email string
+			// for emailAddress.Next() {
+			// 	err := emailAddress.Scan(&email)
+			// 	if err != nil {
+			// 		fmt.Println(err)
+			// 	}
+			// }
+			// SendEmail(email)
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 			return
 		}

@@ -16,7 +16,7 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 
 	myUser := GetUser(res, req)
 	if myUser.Rights == "legal" {
-		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester FROM contracts_db.Contracts WHERE ApproveStatus='Approve'")
+		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester FROM contracts_db.Contracts WHERE ApproveStatus='Approve' AND Contract IS NULL")
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -73,7 +73,18 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 					}
 				}
 			}
-			//SendEmail("testtechnology.93@gmail.com")
+			// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'contractadmin'")
+			// if err != nil {
+			// 	fmt.Println(err)
+			// }
+			// var email string
+			// for emailAddress.Next() {
+			// 	err := emailAddress.Scan(&email)
+			// 	if err != nil {
+			// 		fmt.Println(err)
+			// 	}
+			// 	SendEmail(email)
+			// }
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "draft.html", display)

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type contract struct {
@@ -24,7 +25,7 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 		//to add on new column (signed?)
 		results, err := Db.Query("SELECT Id, Contract, SeniorFinance FROM contracts_db.Contracts WHERE Finalised = 'Pending' AND Contract IS NOT NULL")
 		if err != nil {
-			fmt.Println("Cannot extract contract file")
+			fmt.Println(err)
 		}
 		//display is a list of contracts
 		display := []contract{}
@@ -32,7 +33,7 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 		for results.Next() {
 			err := results.Scan(&row.ID, &row.Contract, &row.SeniorFinance)
 			if err != nil {
-				fmt.Println("Cannot scan into row")
+				fmt.Println(err)
 			}
 			display = append(display, row)
 		}
@@ -41,13 +42,12 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 			contractRequestIDstring := req.FormValue("contractrequestid")
 			contractRequestIDint, err := strconv.Atoi(contractRequestIDstring)
 			if err != nil {
-				fmt.Println("invalid, unapproved or no contract ID")
+				fmt.Println(err)
 			}
 
 			req.ParseMultipartForm(10 << 20)
 			file, _, err := req.FormFile("myFile")
 			if err != nil {
-				fmt.Println("oh no")
 				fmt.Println(err)
 				return
 			}
@@ -71,15 +71,26 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 
 			for _, v := range display {
 				if v.ID == contractRequestIDint {
-					signed := "Signed"
-					query := fmt.Sprintf("UPDATE Contracts SET Contract = '%s', Finalised = '%s', Archived = 'Pending' WHERE ID='%s'", filepath, signed, contractRequestIDstring)
-					_, err := Db.Query(query)
+					signed := "Yes"
+					actionTime := time.Now().Format(time.RFC3339)
+					_, err := Db.Query("UPDATE Contracts SET Contract = ?, Finalised = ?, ActionTime = ?, Archived = 'Pending' WHERE ID=?", filepath, signed, actionTime, contractRequestIDstring)
 					if err != nil {
-						fmt.Println("Unable to update Contracts database")
+						fmt.Println(err)
 					}
 				}
 			}
-			SendEmail("testtechnology.93@gmail.com")
+			emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'contractadmin'")
+			if err != nil {
+				fmt.Println(err)
+			}
+			var email string
+			for emailAddress.Next() {
+				err := emailAddress.Scan(&email)
+				if err != nil {
+					fmt.Println(err)
+				}
+				SendEmail(email)
+			}
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "signatory.html", display)

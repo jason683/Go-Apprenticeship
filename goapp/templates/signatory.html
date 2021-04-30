@@ -17,20 +17,25 @@
     </tr>
     <tr>
         <td>{{.ID}}</td>
-        <td><a href="file://smu/Desktop/Go/go/src/Apprentice/Go-Apprenticeship/goapp/{{.}}">{{.Contract}}</a></td>
+        <td><a href="https://127.0.0.1:5000/readfile?filename={{.Contract}}">{{.Contract}}</a></td>
         <td>{{.SeniorFinance}}</td>
     </tr>
 </table>
 {{end}}
-<h3>Please upload the contract</h3>
+<h2>Please upload the contract</h2>
 <form 
     enctype="multipart/form-data"
-    action="https://127.0.0.1:5000/showcontracts"
+    action="https://127.0.0.1:5000/upload"
     method="POST"
 >
+    <select name="contractrequestid">
+    <option disabled selected value="">Enter request ID</option>
+    {{range .}}
+    <option value="{{.ID}}">{{.ID}}</option>
+    {{end}}
+    </select><br>   
     <input type="file" name="myFile"/>
-    <input type="text" name="contractrequestid" placeholder="Key in contract ID"><br>
-    <input type="submit" value="upload"/>
+    <input type="submit" value="Upload">
 </form>
 
 <h4>Or <a href="/signup">Sign Up</a> if you do not have an account</h4>

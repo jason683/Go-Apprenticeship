@@ -7,10 +7,13 @@
 <body>
 <h1>Welcome to the Contract Management System!</h1>
 <h2>Email list</h2>
-{{.}}
-
 <form method="POST">
-    <input type="text" name="email" placeholder="Key in email"><br>
+    <select name="email">
+        <option disabled selected value="">Choose the email</option>
+        {{range .}}
+        <option value="{{.}}">{{.}}</option>
+        {{end}}
+        </select><br> 
     <input type="submit">
 </form>
 

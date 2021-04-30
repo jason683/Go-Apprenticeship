@@ -2,10 +2,11 @@ package functions
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -59,21 +60,29 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 				fmt.Println("invalid, unapproved or no contract ID")
 			}
 
-			//change NULL to potentially yes. Yes if contract value is beyond a certain amount for the given business
-			signatory := req.FormValue("signatory")
+			//change SeniorFinance Column to Yes if contract value is beyond a certain amount for the given business
+			seniorFinance := req.FormValue("seniorfinance")
 			for _, v := range display {
 				if v.ID == contractRequestIDint {
-					lowercaseSignatory := strings.ToLower(signatory)
-					if lowercaseSignatory == "yes" {
-						query := fmt.Sprintf("UPDATE Contracts SET SeniorFinance='%s', Finalised='Pending' WHERE Id='%s'", signatory, contractRequestIDstring)
-						_, err := Db.Query(query)
-						if err != nil {
-							fmt.Println("Unable to update database in relation to signatories")
-						}
+					actionTime := time.Now().Format(time.RFC3339)
+					_, err := Db.Query("UPDATE Contracts SET SeniorFinance=?, Finalised='Pending', ActionTime=? WHERE Id=?", seniorFinance, actionTime, contractRequestIDstring)
+					if err != nil {
+						fmt.Println(err)
 					}
 				}
 			}
-			SendEmail("testtechnology.93@gmail.com")
+			// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'signatory'")
+			// if err != nil {
+			// 	fmt.Println(err)
+			// }
+			// var email string
+			// for emailAddress.Next() {
+			// 	err := emailAddress.Scan(&email)
+			// 	if err != nil {
+			// 		fmt.Println(err)
+			// 	}
+			// 	SendEmail(email)
+			// }
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "contractvalue.html", display)
@@ -90,16 +99,16 @@ func ArchiveContract(res http.ResponseWriter, req *http.Request) {
 	}
 	myUser := GetUser(res, req)
 	if myUser.Rights == "contractadmin" {
-		results, err := Db.Query("SELECT Id, Contract FROM contracts_db.Contracts WHERE Archived = 'Pending' AND Finalised = 'Signed'")
+		results, err := Db.Query("SELECT Id, Contract FROM contracts_db.Contracts WHERE Archived = 'Pending' AND Finalised = 'Yes'")
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		display := []finalisedContract{}
 		var contract finalisedContract
 		for results.Next() {
 			err := results.Scan(&contract.ID, &contract.Contract)
 			if err != nil {
-				fmt.Println("Unable to scan into contract variable")
+				fmt.Println(err)
 			}
 			display = append(display, contract)
 		}
@@ -112,10 +121,10 @@ func ArchiveContract(res http.ResponseWriter, req *http.Request) {
 			}
 			for _, v := range display {
 				if v.ID == contractRequestIDint {
-					query := fmt.Sprintf("UPDATE Contracts SET Archived = 'Yes' WHERE Id='%s'", contractRequestIDstring)
-					_, err := Db.Query(query)
+					actionTime := time.Now().Format(time.RFC3339)
+					_, err := Db.Query("UPDATE Contracts SET Archived = 'Yes', ActionTime=? WHERE Id=?", actionTime, contractRequestIDstring)
 					if err != nil {
-						fmt.Println("Unable to update database column 'Archived' to 'Yes'")
+						fmt.Println(err)
 					}
 				}
 			}
@@ -164,7 +173,6 @@ func IdentifyOutdatedRequest(res http.ResponseWriter, req *http.Request) {
 				}
 			}
 		}
-
 		displaySecond := []row{}
 		var contract row
 		dbquery, err := Db.Query("SELECT Id, BusinessOwner, ApproveStatus, Contract, FinanceTax, Finalised, Archived FROM Contracts WHERE Outdated = 'Yes'")
@@ -191,7 +199,6 @@ func EmailList(res http.ResponseWriter, req *http.Request) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 		return
 	}
-
 	myUser := GetUser(res, req)
 	if myUser.Rights == "contractadmin" {
 		dbquery, err := Db.Query("SELECT Email FROM Users")
@@ -207,7 +214,6 @@ func EmailList(res http.ResponseWriter, req *http.Request) {
 			}
 			emailList = append(emailList, email)
 		}
-
 		if req.Method == http.MethodPost {
 			email := req.FormValue("email")
 			for _, v := range emailList {
@@ -216,11 +222,20 @@ func EmailList(res http.ResponseWriter, req *http.Request) {
 					http.Redirect(res, req, "/directory", http.StatusSeeOther)
 				}
 			}
-			fmt.Fprintf(res, "No valid email was found.")
 		}
-
 		Tpl.ExecuteTemplate(res, "emaillist.html", emailList)
 	} else {
 		fmt.Fprintf(res, "You are not authorised to view this page")
 	}
+}
+
+//Test is to be exported
+func Test(res http.ResponseWriter, req *http.Request) {
+	params := req.URL.Query()
+	filename := params["filename"]
+	f, err := os.Open("/Users/smu/Desktop/Go/go/src/Apprentice/Go-Apprenticeship/goapp/" + filename[0])
+	if err != nil {
+		panic(err)
+	}
+	io.Copy(res, f)
 }

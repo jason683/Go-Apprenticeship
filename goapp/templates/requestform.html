@@ -15,19 +15,8 @@
      <option value="{{.first}}">{{.first}}</option>
      <option value="{{.second}}">{{.second}}</option>
  </select>
- <input type="text" name="newbusiness" placeholder="New business type (optional)"><br>
- <div>
-    {{ with .nobusiness}}
-    <p>{{ . }}</p>
-    {{ end }}
-</div>
-<div>
-    {{ with .duplicatebusiness}}
-    <p>{{ . }}</p>
-    {{ end }}
-</div>
  <input type="text" name="contracttype" placeholder="Contract Type"><br>
- <input type="text" name="contractvalue" placeholder="Contract Value"><br>
+ <input type="text" name="contractvalue" placeholder="Contract Value (optional)"><br>
  <div>
     {{ with .input0}}
     <p>{{ . }}</p>
@@ -39,12 +28,17 @@
     <p>{{ . }}</p>
     {{ end }}
 </div>
-<input type="text" name="region" placeholder="Region"><br>
+<input type="text" name="region" placeholder="Region (optional)"><br>
 <input type="text" name="effectivedate" placeholder="Effective Date"><br>
-<input type="text" name="terminationdate" placeholder="Termination Date"><br>
-<input type="text" name="backgroundpurpose" placeholder="Background and Purpose"><br>
-<input type="text" name="counterpartycontactinfo" placeholder="Counterparty Contact Information"><br>
-
+<input type="text" name="terminationdate" placeholder="Termination Date (optional)"><br>
+<input type="text" name="backgroundpurpose" placeholder="Background and Purpose (optional)"><br>
+<input type="text" name="counterpartycontactinfo" placeholder="Counterparty Contact Information (optional)"><br>
+<input type="text" name="others" placeholder="Key in new business type and/or any additional information (optional)"><br>
+<div>
+   {{ with .nobusiness}}
+   <p>{{ . }}</p>
+   {{ end }}
+</div>
  <input type="submit">
 </form>
 <h2>Or <a href="/signup">Sign Up</a> if you do not have an account</h2>

@@ -20,8 +20,13 @@
 </table>
 {{end}}
 <form method="post">
-    <label for ="contractrequestid">Please key in the contract Id that you have archived</label>
-    <input type="text" name="contractrequestid" placeholder="Contract ID"><br>
+    <label for ="contractrequestid">Please key in the contract Id that you want to archive</label>
+    <select name="contractrequestid">
+        <option disabled selected value="">Enter request ID</option>
+        {{range .}}
+        <option value="{{.ID}}">{{.ID}}</option>
+        {{end}}
+        </select><br>   
     <input type="submit" value="Archive">
 </form>
 <h2><a href="/directory">Home page</a></h2>

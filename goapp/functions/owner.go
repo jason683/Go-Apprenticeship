@@ -37,7 +37,7 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 	if myUser.Rights == "bizowner" {
 		results, err := Db.Query("SELECT Id, SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester FROM contracts_db.Contracts WHERE BusinessOwner = ? AND ApproveStatus ='Pending'", myUser.Username)
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err)
 		}
 		//display variable will contain a list of all the pending contract requests
 		display := []contractRequest{}
@@ -45,7 +45,7 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 		for results.Next() {
 			err := results.Scan(&reviewRequest.ID, &reviewRequest.SigningEntity, &reviewRequest.CounterpartyName, &reviewRequest.Business, &reviewRequest.ContractType, &reviewRequest.ContractValue, &reviewRequest.Region, &reviewRequest.EffectiveDate, &reviewRequest.TerminationDate, &reviewRequest.BackgroundPurpose, &reviewRequest.CounterpartyContactInfo, &reviewRequest.Requester)
 			if err != nil {
-				panic(err.Error())
+				fmt.Println(err)
 			}
 			display = append(display, reviewRequest)
 		}
@@ -56,7 +56,7 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 			contractRequestIDstring := req.FormValue("contractrequestid")
 			contractRequestIDint, err := strconv.Atoi(contractRequestIDstring)
 			if err != nil {
-				panic(err.Error())
+				fmt.Println(err)
 			}
 			//section below will change pending status to either approve or reject status
 			contractRequestStatus := req.FormValue("approvereject")
@@ -66,23 +66,44 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 					if lowercaseContractRequestStatus == "approve" || lowercaseContractRequestStatus == "reject" {
 						if v.ContractValue > 0 {
 							actionTime := time.Now().Format(time.RFC3339)
-							query := fmt.Sprintf("UPDATE Contracts SET ApproveStatus='%s', FinanceTax='Pending', ActionTime='%s' WHERE Id='%s'", contractRequestStatus, actionTime, contractRequestIDstring)
-							_, err := Db.Query(query)
+							_, err := Db.Query("UPDATE Contracts SET ApproveStatus=?, FinanceTax='Pending', ActionTime=? WHERE Id=?", contractRequestStatus, actionTime, contractRequestIDstring)
 							if err != nil {
-								panic(err.Error())
+								fmt.Println(err)
 							}
+							// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'financetax'")
+							// if err != nil {
+							// 	fmt.Println(err)
+							// }
+							// var email string
+							// for emailAddress.Next() {
+							// 	err := emailAddress.Scan(&email)
+							// 	if err != nil {
+							// 		fmt.Println(err)
+							// 	}
+							// 	SendEmail(email)
+							// }
 						} else {
 							actionTime := time.Now().Format(time.RFC3339)
-							query := fmt.Sprintf("UPDATE Contracts SET ApproveStatus='%s', ActionTime='%s' WHERE Id='%s'", contractRequestStatus, actionTime, contractRequestIDstring)
-							_, err := Db.Query(query)
+							_, err := Db.Query("UPDATE Contracts SET ApproveStatus=?, FinanceTax='NA', ActionTime=? WHERE Id=?", contractRequestStatus, actionTime, contractRequestIDstring)
 							if err != nil {
-								panic(err.Error())
+								fmt.Println(err)
 							}
+							// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'legal'")
+							// if err != nil {
+							// 	fmt.Println(err)
+							// }
+							// var email string
+							// for emailAddress.Next() {
+							// 	err := emailAddress.Scan(&email)
+							// 	if err != nil {
+							// 		fmt.Println(err)
+							// 	}
+							// 	SendEmail(email)
+							// }
 						}
 					}
 				}
 			}
-			SendEmail("testtechnology.93@gmail.com")
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "revrequest.html", display)
