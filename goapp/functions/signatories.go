@@ -95,6 +95,6 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 		}
 		Tpl.ExecuteTemplate(res, "signatory.html", display)
 	} else {
-		fmt.Fprintf(res, "You are not authorised to view this page")
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 }

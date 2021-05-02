@@ -28,6 +28,8 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			reviewRequest.EffectiveDate = reviewRequest.EffectiveDate[:10]
+			reviewRequest.TerminationDate = reviewRequest.TerminationDate[:10]
 			display = append(display, reviewRequest)
 		}
 		if req.Method == http.MethodPost {
@@ -89,7 +91,7 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 		}
 		Tpl.ExecuteTemplate(res, "draft.html", display)
 	} else {
-		fmt.Fprintf(res, "You are not authorised to view this page")
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 
 }

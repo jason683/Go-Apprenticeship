@@ -5,11 +5,11 @@
  <title>Email list</title>
 </head>
 <body>
-<h1>Welcome to the Contract Management System!</h1>
-<h2>Email list</h2>
+<h1>Email List</h1>
+<h2>Please select the email that corresponds to the action owner that you want to chase.</h2>
 <form method="POST">
     <select name="email">
-        <option disabled selected value="">Choose the email</option>
+        <option disabled selected value="">Email</option>
         {{range .}}
         <option value="{{.}}">{{.}}</option>
         {{end}}
@@ -17,8 +17,8 @@
     <input type="submit">
 </form>
 
-
-<h4>Or <a href="/signup">Sign Up</a> if you do not have an account</h4>
+<h3><a href="/directory">Home page</a><br>
+    <a href="/logout">Log Out</a></h3>
 
 </body>
 </html>

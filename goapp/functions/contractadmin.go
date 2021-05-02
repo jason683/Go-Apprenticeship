@@ -50,6 +50,8 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			reviewRequest.EffectiveDate = reviewRequest.EffectiveDate[:10]
+			reviewRequest.TerminationDate = reviewRequest.TerminationDate[:10]
 			display = append(display, reviewRequest)
 		}
 
@@ -132,7 +134,7 @@ func ArchiveContract(res http.ResponseWriter, req *http.Request) {
 		}
 		Tpl.ExecuteTemplate(res, "archivecontract.html", display)
 	} else {
-		fmt.Fprintf(res, "You are not authorised to view this page.")
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 }
 
@@ -189,7 +191,7 @@ func IdentifyOutdatedRequest(res http.ResponseWriter, req *http.Request) {
 		Tpl.ExecuteTemplate(res, "outdatedcontract.html", displaySecond)
 
 	} else {
-		fmt.Fprintf(res, "You are not authorised to view this page")
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 }
 
@@ -225,7 +227,7 @@ func EmailList(res http.ResponseWriter, req *http.Request) {
 		}
 		Tpl.ExecuteTemplate(res, "emaillist.html", emailList)
 	} else {
-		fmt.Fprintf(res, "You are not authorised to view this page")
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -28,6 +27,8 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			reviewRequest.EffectiveDate = reviewRequest.EffectiveDate[:10]
+			reviewRequest.TerminationDate = reviewRequest.TerminationDate[:10]
 			display = append(display, reviewRequest)
 		}
 		if req.Method == http.MethodPost {
@@ -43,8 +44,7 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 			contractRequestStatus := req.FormValue("approvereject")
 			for _, v := range display {
 				if v.ID == contractRequestIDint {
-					lowercaseContractRequestStatus := strings.ToLower(contractRequestStatus)
-					if lowercaseContractRequestStatus == "approve" || lowercaseContractRequestStatus == "reject" {
+					if contractRequestStatus == "Approve" || contractRequestStatus == "Reject" {
 						actionTime := time.Now().Format(time.RFC3339)
 						_, err := Db.Query("UPDATE Contracts SET FinanceTax=?, ActionTime=? WHERE Id=?", contractRequestStatus, actionTime, contractRequestIDstring)
 						if err != nil {
@@ -67,8 +67,8 @@ func FinanceTax(res http.ResponseWriter, req *http.Request) {
 			}
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
-		Tpl.ExecuteTemplate(res, "financetax.html", display)
+		Tpl.ExecuteTemplate(res, "revrequest.html", display)
 	} else {
-		fmt.Fprintf(res, "You are not authorised to view this page")
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 }

@@ -16,8 +16,6 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 
 	myUser := GetUser(res, req)
 	if myUser.Rights == "bizrequester" {
-		mapBusiness["first"] = "Games & E-Commerce"
-		mapBusiness["second"] = "Digital Finance"
 
 		if req.Method == http.MethodPost {
 			errorMessage := map[string]string{}
@@ -37,14 +35,14 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 			businessOwner := req.FormValue("businessowner")
 			approveStatus := "Pending"
 
-			if signingEntity == "" || counterpartyName == "" || contractType == "" || businessOwner == "" {
-				errorMessage["input1"] = "Did you miss out entering any fields?"
+			if signingEntity == "" || counterpartyName == "" || contractType == "" || businessOwner == "" || effectiveDate == "" || terminationDate == "" {
+				errorMessage["input1"] = "Did you miss out entering any of the compulsory fields?"
 				Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
 				delete(errorMessage, "input1")
 				return
 			}
 			if business == "" && others == "" {
-				errorMessage["nobusiness"] = "You have not entered any value for the business field"
+				errorMessage["nobusiness"] = "You have not entered any value for the business type field"
 				Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
 				delete(errorMessage, "nobusiness")
 				return
@@ -58,6 +56,12 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 					return
 				}
 			}
+			if business != "" && business != "Games & E-Commerce" && business != "Digital Finance" {
+				errorMessage["input2"] = "You need to key in a valid business type"
+				Tpl.ExecuteTemplate(res, "requestform.html", errorMessage)
+				delete(errorMessage, "input2")
+				return
+			}
 			if contractValue == "" {
 				contractValue = "0"
 			}
@@ -66,9 +70,6 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 			}
 			if region == "" {
 				region = "NA"
-			}
-			if terminationDate == "" {
-				terminationDate = "0001-01-01"
 			}
 			if counterpartyContactInfo == "" {
 				counterpartyContactInfo = "NA"
@@ -97,6 +98,6 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 		}
 		Tpl.ExecuteTemplate(res, "requestform.html", mapBusiness)
 	} else {
-		fmt.Fprintf(res, "You are not authorised to view this page")
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 }

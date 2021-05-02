@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
  <meta charset="UTF-8">
+ <style>
+    p     { display: table-row; }
+    label { display: table-cell; width: 100px; }
+    input { display: table-cell; }
+</style>
  <title>LOGIN</title>
 </head>
 <body>
@@ -13,10 +18,17 @@
         <p>{{ . }}</p>
         {{ end }}
     </div>
- <input type="text" name="username" placeholder="username"><br>
- <input type="password" name="password" placeholder="password"><br>
+<p>
+    <label for ="username">Username:</label>
+    <input type="text" name="username"><br>
+</p>
+<p>
+    <label for ="password">Password:</label>
+    <input type="password" name="password"><br>
+</p><br>
  <input type="submit">
 </form>
 <h2>Or <a href="/signup">Sign Up</a> if you do not have an account</h2>
+
 </body>
 </html>

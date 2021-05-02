@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -47,6 +46,8 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			reviewRequest.EffectiveDate = reviewRequest.EffectiveDate[:10]
+			reviewRequest.TerminationDate = reviewRequest.TerminationDate[:10]
 			display = append(display, reviewRequest)
 		}
 		if req.Method == http.MethodPost {
@@ -62,8 +63,7 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 			contractRequestStatus := req.FormValue("approvereject")
 			for _, v := range display {
 				if v.ID == contractRequestIDint {
-					lowercaseContractRequestStatus := strings.ToLower(contractRequestStatus)
-					if lowercaseContractRequestStatus == "approve" || lowercaseContractRequestStatus == "reject" {
+					if contractRequestStatus == "Approve" || contractRequestStatus == "Reject" {
 						if v.ContractValue > 0 {
 							actionTime := time.Now().Format(time.RFC3339)
 							_, err := Db.Query("UPDATE Contracts SET ApproveStatus=?, FinanceTax='Pending', ActionTime=? WHERE Id=?", contractRequestStatus, actionTime, contractRequestIDstring)
@@ -108,6 +108,6 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 		}
 		Tpl.ExecuteTemplate(res, "revrequest.html", display)
 	} else {
-		fmt.Fprintf(res, "You are not authorised to view this page")
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 	}
 }
