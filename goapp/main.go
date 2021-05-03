@@ -49,6 +49,7 @@ func main() {
 	router.HandleFunc("/outdated", functions.IdentifyOutdatedRequest)
 	router.HandleFunc("/emaillist", functions.EmailList)
 	router.HandleFunc("/readfile", functions.Test)
+	router.HandleFunc("/result", functions.Result)
 	fmt.Println("Listening at port 5000")
 
 	http.ListenAndServeTLS(":5000", "cert.pem", "key.pem", router)

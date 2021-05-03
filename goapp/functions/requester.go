@@ -93,7 +93,8 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 			// 	}
 			// }
 			// SendEmail(email)
-			http.Redirect(res, req, "/directory", http.StatusSeeOther)
+			relationMap[myUser.Username] = "Yes"
+			http.Redirect(res, req, "/result", http.StatusSeeOther)
 			return
 		}
 		Tpl.ExecuteTemplate(res, "requestform.html", mapBusiness)

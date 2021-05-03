@@ -104,7 +104,8 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 					}
 				}
 			}
-			http.Redirect(res, req, "/directory", http.StatusSeeOther)
+			relationMap[myUser.Username] = "Yes"
+			http.Redirect(res, req, "/result", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "revrequest.html", display)
 	} else {

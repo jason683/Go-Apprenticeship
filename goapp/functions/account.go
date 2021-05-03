@@ -25,15 +25,20 @@ type Staff struct {
 	Rights   string
 }
 
+//UserResult is to be exported
+type UserResult struct {
+	Username string
+}
+
 var (
 	//Db is to be exported
 	Db *sql.DB
 	//Err is to be exported
-	Err           error
-	mapUsers      = map[string]Staff{}
-	mapSessions   = map[string]string{}
-	mapTypeRights = map[string]string{}
-	mapBusiness   = map[string]string{}
+	Err         error
+	mapUsers    = map[string]Staff{}
+	mapSessions = map[string]string{}
+	mapBusiness = map[string]string{}
+	relationMap = map[string]string{}
 	//Tpl is to be exported
 	Tpl *template.Template
 )
@@ -46,7 +51,6 @@ func Start(res http.ResponseWriter, req *http.Request) {
 }
 
 //GetUser is to be exported
-//Staff
 func GetUser(res http.ResponseWriter, req *http.Request) Staff {
 	//this stores the cookie data in myCookie
 	//this subsequent part is necessary so that when the user accesses the index page, the page can load
@@ -317,9 +321,6 @@ func Login(res http.ResponseWriter, req *http.Request) {
 		mapSessions[myCookie.Value] = username
 		mapUsers[username] = myUser
 		log.Println("Cookie session created successfully")
-
-		// templateRights := allocateRights(myUser)
-		// Tpl.ExecuteTemplate(res, "directory.html", templateRights)
 		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		return
 	}

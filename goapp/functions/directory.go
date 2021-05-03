@@ -11,7 +11,7 @@ func Directory(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	myUser := GetUser(res, req)
-	//concurrency issue on mapTypeRights
+	mapTypeRights := make(map[string]string)
 	if myUser.Rights == "bizrequester" {
 		mapTypeRights["bizrequester"] = "hello requester"
 		Tpl.ExecuteTemplate(res, "directory.html", mapTypeRights)

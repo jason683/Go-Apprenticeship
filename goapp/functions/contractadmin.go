@@ -85,7 +85,8 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 			// 	}
 			// 	SendEmail(email)
 			// }
-			http.Redirect(res, req, "/directory", http.StatusSeeOther)
+			relationMap[myUser.Username] = "Yes0"
+			http.Redirect(res, req, "/result", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "contractvalue.html", display)
 	} else {
@@ -130,7 +131,8 @@ func ArchiveContract(res http.ResponseWriter, req *http.Request) {
 					}
 				}
 			}
-			http.Redirect(res, req, "/directory", http.StatusSeeOther)
+			relationMap[myUser.Username] = "Yes1"
+			http.Redirect(res, req, "/result", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "archivecontract.html", display)
 	} else {
@@ -221,7 +223,8 @@ func EmailList(res http.ResponseWriter, req *http.Request) {
 			for _, v := range emailList {
 				if v == email {
 					SendEmail(v)
-					http.Redirect(res, req, "/directory", http.StatusSeeOther)
+					relationMap[myUser.Username] = "Yes2"
+					http.Redirect(res, req, "/result", http.StatusSeeOther)
 				}
 			}
 		}
