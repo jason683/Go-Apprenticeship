@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -101,18 +102,13 @@ func TestLogin(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	request, err := http.NewRequest("POST", "https://127.0.0.1:5000/login", bytes.NewReader(requestBody))
+
+	request, err := http.NewRequest("POST", "/login", bytes.NewReader(requestBody))
+	fmt.Println(request.Body)
 	var m map[string]string
 	err = json.NewDecoder(request.Body).Decode(&m)
 	fmt.Println(m)
-	//request.Body.Close()
 
-	//request, _ := http.NewRequest("POST", "https://127.0.0.1:5000/login", nil)
-	// response, err := http.Post("https://127.0.0.1:5000/login", "application/json", bytes.NewBuffer(requestBody))
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-	//defer response.Body.Close()
 	request.Header.Set("Content-Type", "application/json")
 	response := httptest.NewRecorder()
 	Router().ServeHTTP(response, request)
@@ -123,6 +119,15 @@ func TestLogin(t *testing.T) {
 		t.Fatalf("Error: %v", err)
 	}
 	fmt.Println(string(b))
+	templateString := string(b)
+	boolean0 := strings.Contains(templateString, "Show/Upload contracts")
+	if boolean0 == true {
+		t.Errorf("Expected false; got %v", boolean0)
+	}
+	boolean1 := strings.Contains(templateString, "Create a request")
+	if boolean1 == false {
+		t.Errorf("Expected true; got %v", boolean1)
+	}
 }
 
 // func TestSignup(t *testing.T) {

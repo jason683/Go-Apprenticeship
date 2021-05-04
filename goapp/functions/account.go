@@ -279,14 +279,12 @@ func Login(res http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
 		username := req.FormValue("username")
 		password := req.FormValue("password")
-		//this Dbquery command will extract the row where the username in Db corresponds to what was entered in the form
 		results, err := Db.Query("SELECT Username, Password, FirstName, LastName, Email, Rights FROM contracts_db.Users WHERE Username = ?", username)
 		if err != nil {
 			panic(err.Error())
 		}
 		errorMessage := map[string]string{}
 		var myUser Staff
-		//scanning that 1 row
 		for results.Next() {
 			err := results.Scan(&myUser.Username, &myUser.Password, &myUser.First, &myUser.Last, &myUser.Email, &myUser.Rights)
 			if err != nil {
@@ -296,9 +294,16 @@ func Login(res http.ResponseWriter, req *http.Request) {
 				return
 			}
 		}
+		// fmt.Println(myUser.Username)
+		// fmt.Println("HOHO")
+		// fmt.Println(myUser.Password)
+		// fmt.Println("HEHE")
 		//using bcrypt library to check if the encrypted passwords match
 		err = bcrypt.CompareHashAndPassword(myUser.Password, []byte(password))
 		if err != nil {
+			// fmt.Println("HEYY")
+			// fmt.Println(password)
+			// fmt.Println(myUser.Password)
 			errorMessage["errorUserAndPassword"] = "Username and/or password do not match or are invalid"
 			Tpl.ExecuteTemplate(res, "login.html", errorMessage)
 			delete(errorMessage, "errorUserAndPassword")
