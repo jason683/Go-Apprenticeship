@@ -104,14 +104,14 @@ func TestLogin(t *testing.T) {
 	}
 
 	request, err := http.NewRequest("POST", "/login", bytes.NewReader(requestBody))
-	fmt.Println(request.Body)
-	var m map[string]string
-	err = json.NewDecoder(request.Body).Decode(&m)
-	fmt.Println(m)
 
 	request.Header.Set("Content-Type", "application/json")
+
 	response := httptest.NewRecorder()
+
 	Router().ServeHTTP(response, request)
+	//functions.Login(response, request)
+
 	res := response.Result()
 	defer res.Body.Close()
 	b, err := ioutil.ReadAll(res.Body)
