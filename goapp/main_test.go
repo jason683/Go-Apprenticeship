@@ -103,7 +103,11 @@ func TestLogin(t *testing.T) {
 		log.Fatalln(err)
 	}
 
-	request, err := http.NewRequest("POST", "/login", bytes.NewReader(requestBody))
+	var json = []byte(`{"username": "jasonfoo1", "password": "hello123"}`)
+	fmt.Println(requestBody)
+	fmt.Println(json)
+
+	request, err := http.NewRequest("POST", "/login", bytes.NewReader(json))
 
 	request.Header.Set("Content-Type", "application/json")
 
