@@ -4,7 +4,6 @@ import (
 	"Apprentice/Go-Apprenticeship/goapp/functions"
 	"bytes"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -95,126 +95,248 @@ func TestLogin(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expect nil error; got %v", err)
 	}
-	requestBody, err := json.Marshal(map[string]string{
-		"username": testUser,
-		"password": testPassword,
-	})
+	// requestBody, err := json.Marshal(map[string]string{
+	// 	"username": testUser,
+	// 	"password": testPassword,
+	// })
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	request, err := http.NewRequest("POST", fmt.Sprintf("https://127.0.0.1:5000/login?username=%s&password=%s", testUser, testPassword), nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Error(err)
 	}
 
-	var json = []byte(`{"username": "jasonfoo1", "password": "hello123"}`)
-	fmt.Println(requestBody)
-	fmt.Println(json)
-
-	request, err := http.NewRequest("POST", "/login", bytes.NewReader(json))
-
-	request.Header.Set("Content-Type", "application/json")
+	// request.Header.Set("Content-Type", "application/json")
 
 	response := httptest.NewRecorder()
 
 	Router().ServeHTTP(response, request)
-	//functions.Login(response, request)
 
 	res := response.Result()
 	defer res.Body.Close()
+	_, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		t.Fatalf("Error: %v", err)
+	}
+	boolean0 := assert.Equal(t, "/directory", res.Header.Get("Location"))
+	if boolean0 != true {
+		t.Error(err)
+	}
+}
+
+func TestSignup(t *testing.T) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	databaseUser := os.Getenv("DATABASEUSER")
+	databasePW := os.Getenv("DATABASEPW")
+	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/contracts_db?parseTime=true", databaseUser, databasePW)
+	functions.Db, functions.Err = sql.Open("mysql", databaseString)
+	if functions.Err != nil {
+		panic(functions.Err.Error())
+	} else {
+		fmt.Println("Database opened!")
+	}
+	defer functions.Db.Close()
+	testUser := []struct {
+		username  string
+		password  string
+		firstName string
+		lastName  string
+		email     string
+	}{
+		{username: "test", password: "testing", firstName: "first", lastName: "last", email: "abc@gmail.com"},
+		{username: "test1", password: "testing", email: "abc@gmail.com"},
+		{username: "test2", password: "testing1", firstName: "first", lastName: "last", email: "abc@gmail.com"},
+	}
+
+	errorCount := 0
+	redirectionCount := 0
+	for _, tc := range testUser {
+		t.Run(tc.username, func(t *testing.T) {
+			request, _ := http.NewRequest("POST", "https://127.0.0.1:5000/signup?username="+tc.username+"&password="+tc.password+"&firstname="+tc.firstName+"&lastname="+tc.lastName+"&email="+tc.email, nil)
+			response := httptest.NewRecorder()
+			Router().ServeHTTP(response, request)
+
+			res := response.Result()
+			defer res.Body.Close()
+			b, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				t.Fatalf("Error: %v", err)
+			}
+
+			templateString := string(b)
+
+			boolean0 := checkSubstrings(templateString, "Missing particulars", "username must have at least 5 characters and at most 12 characters")
+			if boolean0 == true {
+				errorCount++
+			}
+
+			boolean1 := assert.NotEqual(t, "/directory", res.Header.Get("Location"))
+			if boolean1 == false {
+				redirectionCount++
+			}
+		})
+	}
+	if errorCount != 2 {
+		t.Errorf("Expected exactly 2 cases to generate an error each; got %v cases", errorCount)
+	}
+	if redirectionCount != 0 {
+		t.Errorf("Expected exactly 0 redirection case; got %v", redirectionCount)
+	}
+}
+
+func checkSubstrings(template string, substrings ...string) bool {
+	for _, substring := range substrings {
+		if strings.Contains(template, substring) {
+			return true
+		}
+	}
+	return false
+}
+
+func TestDirectory(t *testing.T) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	databaseUser := os.Getenv("DATABASEUSER")
+	databasePW := os.Getenv("DATABASEPW")
+	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/contracts_db?parseTime=true", databaseUser, databasePW)
+	functions.Db, functions.Err = sql.Open("mysql", databaseString)
+	if functions.Err != nil {
+		panic(functions.Err.Error())
+	} else {
+		fmt.Println("Database opened!")
+	}
+	defer functions.Db.Close()
+	testUser := "jasonfoo1"
+	testPassword := "hello123"
+	request, err := http.NewRequest("POST", fmt.Sprintf("https://127.0.0.1:5000/login?username=%s&password=%s", testUser, testPassword), nil)
+	if err != nil {
+		t.Error(err)
+	}
+	response := httptest.NewRecorder()
+	Router().ServeHTTP(response, request)
+	res := response.Result()
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		t.Fatalf("Error: %v", err)
 	}
-	fmt.Println(string(b))
-	templateString := string(b)
-	boolean0 := strings.Contains(templateString, "Show/Upload contracts")
+
+	request.Body = ioutil.NopCloser(bytes.NewReader(b))
+	url := "https://127.0.0.1:5000/directory"
+	proxyRequest, err := http.NewRequest("GET", url, bytes.NewReader(b))
+
+	// secondRequest, err := http.Request("GET", "https://127.0.0.1:5000/directory")
+	// if err != nil {
+	// 	t.Error(err)
+	// }
+	secondResponse := httptest.NewRecorder()
+	Router().ServeHTTP(secondResponse, proxyRequest)
+	secondRes := response.Result()
+	bytes, err := ioutil.ReadAll(secondRes.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	secondTemplateString := string(bytes)
+
+	boolean0 := strings.Contains(secondTemplateString, "Show/Upload contracts")
 	if boolean0 == true {
 		t.Errorf("Expected false; got %v", boolean0)
 	}
-	boolean1 := strings.Contains(templateString, "Create a request")
+	fmt.Println(secondTemplateString)
+
+	boolean1 := strings.Contains(secondTemplateString, "Create a request")
 	if boolean1 == false {
 		t.Errorf("Expected true; got %v", boolean1)
 	}
 }
 
-// func TestSignup(t *testing.T) {
-// 	err := godotenv.Load()
-// 	if err != nil {
-// 		log.Fatal("Error loading .env file")
-// 	}
-// 	databaseUser := os.Getenv("DATABASEUSER")
-// 	databasePW := os.Getenv("DATABASEPW")
-// 	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/contracts_db?parseTime=true", databaseUser, databasePW)
-// 	functions.Db, functions.Err = sql.Open("mysql", databaseString)
-// 	if functions.Err != nil {
-// 		panic(functions.Err.Error())
-// 	} else {
-// 		fmt.Println("Database opened!")
-// 	}
-// 	defer functions.Db.Close()
-// 	testUser := struct {
-// 		username  string
-// 		password  string
-// 		firstName string
-// 		lastName  string
-// 		email     string
-// 	}{
-// 		username: "test", password: "testing", firstName: "first", lastName: "last", email: "abc@gmail.com",
-// 	}
-// 	request, _ := http.NewRequest("POST", "https://127.0.0.1:5000/signup?username="+testUser.username+"&password="+testUser.password+"&firstname="+testUser.firstName+"&lastname="+testUser.lastName+"&email="+testUser.email, nil)
-// 	response := httptest.NewRecorder()
-// 	Router().ServeHTTP(response, request)
+func TestBizRequest(t *testing.T) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	databaseUser := os.Getenv("DATABASEUSER")
+	databasePW := os.Getenv("DATABASEPW")
+	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/contracts_db?parseTime=true", databaseUser, databasePW)
+	functions.Db, functions.Err = sql.Open("mysql", databaseString)
+	if functions.Err != nil {
+		panic(functions.Err.Error())
+	} else {
+		fmt.Println("Database opened!")
+	}
+	defer functions.Db.Close()
+	testUser := []struct {
+		SigningEntity    string
+		CounterpartyName string
+		BusinessType     string
+		ContractType     string
+		ContractValue    string
+		BusinessOwner    string
+		EffectiveDate    string
+		TerminationDate  string
+	}{
+		{SigningEntity: "Shopee", CounterpartyName: "Roblox", BusinessType: "Hardware"},
+		{SigningEntity: "Shopee", CounterpartyName: "Facebook", BusinessType: "Digital Finance", ContractType: "Tech", ContractValue: "Hey", BusinessOwner: "testresults", EffectiveDate: "2019-01-01", TerminationDate: "2020-01-01"},
+		{SigningEntity: "Shopee", CounterpartyName: "Facebook", BusinessType: "testresults", ContractType: "Tech", ContractValue: "Hey", BusinessOwner: "testresults", EffectiveDate: "2019-01-01", TerminationDate: "2020-01-01"},
+	}
 
-// 	res := response.Result()
-// 	defer res.Body.Close()
-// 	b, err := ioutil.ReadAll(res.Body)
-// 	if err != nil {
-// 		t.Fatalf("Error: %v", err)
-// 	}
-// 	templateString := string(b)
-// 	boolean := strings.Contains(templateString, "Missing particulars")
-// 	if boolean == false {
-// 		t.Errorf("Expected true; got %v", boolean)
-// 	}
-// }
+	errorCount := 0
+	redirectionCount := 0
+	for _, tc := range testUser {
+		t.Run(tc.SigningEntity, func(t *testing.T) {
+			request, _ := http.NewRequest("POST", "https://127.0.0.1:5000/createrequest?signingentity="+tc.SigningEntity+"&counterpartyname="+tc.CounterpartyName+"&business="+tc.BusinessType+"&contracttype="+tc.ContractType+"&contractvalue="+tc.ContractValue+"&businessowner="+tc.BusinessOwner+"&effectivedate="+tc.EffectiveDate+"&terminationdate="+tc.TerminationDate, nil)
+			response := httptest.NewRecorder()
+			Router().ServeHTTP(response, request)
 
-// func TestDirectory(t *testing.T) {
-// 	err := godotenv.Load()
-// 	if err != nil {
-// 		log.Fatal("Error loading .env file")
-// 	}
-// 	databaseUser := os.Getenv("DATABASEUSER")
-// 	databasePW := os.Getenv("DATABASEPW")
-// 	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/contracts_db?parseTime=true", databaseUser, databasePW)
-// 	functions.Db, functions.Err = sql.Open("mysql", databaseString)
-// 	if functions.Err != nil {
-// 		panic(functions.Err.Error())
-// 	} else {
-// 		fmt.Println("Database opened!")
-// 	}
-// 	defer functions.Db.Close()
-// 	testUser := "jasonfoo1"
-// 	testPassword := "hello123"
-// 	request, _ := http.NewRequest("POST", "https://127.0.0.1:5000/login?username="+testUser+"&password="+testPassword, nil)
-// 	fmt.Println(request)
-// 	fmt.Println()
+			res := response.Result()
+			defer res.Body.Close()
+			b, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				t.Fatalf("Error: %v", err)
+			}
 
-// 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			templateString := string(b)
 
-// 	fmt.Println(request.Body)
-// 	fmt.Println()
-// 	response := httptest.NewRecorder()
+			boolean0 := checkSubstrings(templateString, "Contract value has to be an integer", "Did you miss out entering any of the compulsory fields?", "You need to key in a valid business type")
+			if boolean0 == true {
+				errorCount++
+			}
 
-// 	Router().ServeHTTP(response, request)
-// 	res := response.Result()
-// 	b, err := ioutil.ReadAll(res.Body)
-// 	if err != nil {
-// 		t.Fatalf("Error: %v", err)
-// 	}
-// 	templateString := string(b)
-// 	boolean0 := strings.Contains(templateString, "Show/Upload contracts")
-// 	if boolean0 == true {
-// 		t.Errorf("Expected false; got %v", boolean0)
-// 	}
-// 	boolean1 := strings.Contains(templateString, "Create a request")
-// 	if boolean1 == false {
-// 		t.Errorf("Expected true; got %v", boolean1)
-// 	}
-// }
+			boolean1 := assert.NotEqual(t, "/directory", res.Header.Get("Location"))
+			if boolean1 == false {
+				redirectionCount++
+			}
+		})
+	}
+	if errorCount != 3 {
+		t.Errorf("Expected all 3 cases to generate an error each; got %v cases", errorCount)
+	}
+	if redirectionCount != 0 {
+		t.Errorf("Expected exactly 0 redirection case; got %v", redirectionCount)
+	}
+
+}
+
+func TestUpload(t *testing.T) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	databaseUser := os.Getenv("DATABASEUSER")
+	databasePW := os.Getenv("DATABASEPW")
+	databaseString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/contracts_db?parseTime=true", databaseUser, databasePW)
+	functions.Db, functions.Err = sql.Open("mysql", databaseString)
+	if functions.Err != nil {
+		panic(functions.Err.Error())
+	} else {
+		fmt.Println("Database opened!")
+	}
+	defer functions.Db.Close()
+
+}

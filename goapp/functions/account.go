@@ -99,6 +99,7 @@ func Signup(res http.ResponseWriter, req *http.Request) {
 		//input validation
 		errorMessage := map[string]string{}
 		if username == "" || password == "" || firstname == "" || lastname == "" || email == "" {
+			log.Println("There are missing particulars")
 			errorMessage["input1"] = "Missing particulars"
 			Tpl.ExecuteTemplate(res, "signup.html", errorMessage)
 			delete(errorMessage, "input1")
@@ -123,6 +124,7 @@ func Signup(res http.ResponseWriter, req *http.Request) {
 		}
 		for k := range checkUsers {
 			if username == k {
+				log.Println("Username has been taken")
 				errorMessage["input2"] = "Username has been taken"
 				Tpl.ExecuteTemplate(res, "signup.html", errorMessage)
 				delete(errorMessage, "input2")
@@ -149,7 +151,7 @@ func Signup(res http.ResponseWriter, req *http.Request) {
 			delete(errorMessage, "input4")
 			return
 		}
-		if len(username) < 6 || len(username) > 12 {
+		if len(username) < 5 || len(username) > 12 {
 			log.Println("username contains too few or too many characters")
 			errorMessage["input5"] = "username must have at least 5 characters and at most 12 characters"
 			Tpl.ExecuteTemplate(res, "signup.html", errorMessage)
@@ -211,7 +213,7 @@ func Signup(res http.ResponseWriter, req *http.Request) {
 			delete(errorMessage, "input11")
 			return
 		}
-		//defer function in response to potential panic if password is not encrypted
+		//defer function in response to potential panic
 		defer func() {
 			if r := recover(); r != nil {
 				fmt.Println("Recovered")
@@ -221,7 +223,6 @@ func Signup(res http.ResponseWriter, req *http.Request) {
 		bPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 		if err != nil {
 			http.Error(res, "Internal server error", http.StatusInternalServerError)
-			log.Panicln("How could this happen")
 		}
 		//if inputs have all been validated, store the data in myUser variable
 		myUser = Staff{username, bPassword, firstname, lastname, email, ""}
@@ -250,7 +251,7 @@ func Signup(res http.ResponseWriter, req *http.Request) {
 		log.Println("New cookie session created")
 		//create a new key value pair in mapSessions to track session usage
 		mapSessions[myCookie.Value] = username
-		http.Redirect(res, req, "/", http.StatusSeeOther)
+		http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		return
 	}
 	//if the user clicks on this page, he or she will first see this template
