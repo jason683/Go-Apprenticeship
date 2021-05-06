@@ -9,19 +9,24 @@ import (
 	mail "github.com/xhit/go-simple-mail/v2"
 )
 
-//SendEmail works on sending email
-func SendEmail(recipient string) {
-	server := mail.NewSMTPClient()
+func init() {
+	server = mail.NewSMTPClient()
 	server.Host = "smtp.gmail.com"
 	server.Port = 587
 
-	serverUserEmail := os.Getenv("USEREMAIL")
+	serverUserEmail = os.Getenv("USEREMAIL")
 	serverPassword := os.Getenv("USERPW")
 
 	server.Username = serverUserEmail
 	server.Password = serverPassword
 	server.Encryption = mail.EncryptionTLS
+}
 
+var server *mail.SMTPServer
+var serverUserEmail string
+
+//SendEmail works on sending email
+func SendEmail(recipient string) {
 	email := mail.NewMSG()
 	sender := fmt.Sprintf("From system admin <%s>", serverUserEmail)
 	email.SetFrom(sender)

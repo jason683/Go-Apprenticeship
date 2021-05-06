@@ -5,14 +5,18 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"bou.ke/monkey"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
@@ -213,44 +217,37 @@ func TestDirectory(t *testing.T) {
 		fmt.Println("Database opened!")
 	}
 	defer functions.Db.Close()
-	testUser := "jasonfoo1"
-	testPassword := "hello123"
-	request, err := http.NewRequest("POST", fmt.Sprintf("https://127.0.0.1:5000/login?username=%s&password=%s", testUser, testPassword), nil)
+	request, err := http.NewRequest("GET", fmt.Sprintf("https://127.0.0.1:5000/directory"), nil)
 	if err != nil {
 		t.Error(err)
 	}
 	response := httptest.NewRecorder()
+
+	g := monkey.Patch(functions.AlreadyLoggedIn, func(req *http.Request) bool {
+		return true
+	})
+	defer g.Unpatch()
+
+	h := monkey.Patch(functions.GetUser, func(res http.ResponseWriter, req *http.Request) functions.Staff {
+		return functions.Staff{Rights: "bizrequester"}
+	})
+	defer h.Unpatch()
+
 	Router().ServeHTTP(response, request)
 	res := response.Result()
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		t.Fatalf("Error: %v", err)
 	}
-
-	request.Body = ioutil.NopCloser(bytes.NewReader(b))
-	url := "https://127.0.0.1:5000/directory"
-	proxyRequest, err := http.NewRequest("GET", url, bytes.NewReader(b))
-
-	// secondRequest, err := http.Request("GET", "https://127.0.0.1:5000/directory")
-	// if err != nil {
-	// 	t.Error(err)
-	// }
-	secondResponse := httptest.NewRecorder()
-	Router().ServeHTTP(secondResponse, proxyRequest)
-	secondRes := response.Result()
-	bytes, err := ioutil.ReadAll(secondRes.Body)
-	if err != nil {
-		t.Error(err)
-	}
-	secondTemplateString := string(bytes)
-
-	boolean0 := strings.Contains(secondTemplateString, "Show/Upload contracts")
+	templateString := string(b)
+	fmt.Println(templateString)
+	boolean0 := strings.Contains(templateString, "Show/Upload contracts")
 	if boolean0 == true {
 		t.Errorf("Expected false; got %v", boolean0)
 	}
-	fmt.Println(secondTemplateString)
+	fmt.Println(templateString)
 
-	boolean1 := strings.Contains(secondTemplateString, "Create a request")
+	boolean1 := strings.Contains(templateString, "Create a request")
 	if boolean1 == false {
 		t.Errorf("Expected true; got %v", boolean1)
 	}
@@ -290,6 +287,16 @@ func TestBizRequest(t *testing.T) {
 	redirectionCount := 0
 	for _, tc := range testUser {
 		t.Run(tc.SigningEntity, func(t *testing.T) {
+
+			g := monkey.Patch(functions.AlreadyLoggedIn, func(req *http.Request) bool {
+				return true
+			})
+			defer g.Unpatch()
+
+			h := monkey.Patch(functions.GetUser, func(res http.ResponseWriter, req *http.Request) functions.Staff {
+				return functions.Staff{Rights: "bizrequester"}
+			})
+			defer h.Unpatch()
 			request, _ := http.NewRequest("POST", "https://127.0.0.1:5000/createrequest?signingentity="+tc.SigningEntity+"&counterpartyname="+tc.CounterpartyName+"&business="+tc.BusinessType+"&contracttype="+tc.ContractType+"&contractvalue="+tc.ContractValue+"&businessowner="+tc.BusinessOwner+"&effectivedate="+tc.EffectiveDate+"&terminationdate="+tc.TerminationDate, nil)
 			response := httptest.NewRecorder()
 			Router().ServeHTTP(response, request)
@@ -300,14 +307,11 @@ func TestBizRequest(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Error: %v", err)
 			}
-
 			templateString := string(b)
-
 			boolean0 := checkSubstrings(templateString, "Contract value has to be an integer", "Did you miss out entering any of the compulsory fields?", "You need to key in a valid business type")
 			if boolean0 == true {
 				errorCount++
 			}
-
 			boolean1 := assert.NotEqual(t, "/directory", res.Header.Get("Location"))
 			if boolean1 == false {
 				redirectionCount++
@@ -320,7 +324,6 @@ func TestBizRequest(t *testing.T) {
 	if redirectionCount != 0 {
 		t.Errorf("Expected exactly 0 redirection case; got %v", redirectionCount)
 	}
-
 }
 
 func TestUpload(t *testing.T) {
@@ -338,5 +341,53 @@ func TestUpload(t *testing.T) {
 		fmt.Println("Database opened!")
 	}
 	defer functions.Db.Close()
+
+	g := monkey.Patch(functions.AlreadyLoggedIn, func(req *http.Request) bool {
+		return true
+	})
+	defer g.Unpatch()
+
+	h := monkey.Patch(functions.GetUser, func(res http.ResponseWriter, req *http.Request) functions.Staff {
+		return functions.Staff{Rights: "legal"}
+	})
+	defer h.Unpatch()
+
+	file, err := os.Open("test.csv")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("myFile", filepath.Base(file.Name()))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	io.Copy(part, file)
+	writer.Close()
+	request, err := http.NewRequest("POST", "https://127.0.0.1:5000/upload", body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+
+	response := httptest.NewRecorder()
+
+	Router().ServeHTTP(response, request)
+
+	res := response.Result()
+	defer res.Body.Close()
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		t.Fatalf("Error: %v", err)
+	}
+	templateString := string(b)
+	fmt.Println(templateString)
 
 }

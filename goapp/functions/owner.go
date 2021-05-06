@@ -22,10 +22,6 @@ type contractRequest struct {
 	Requester               string
 }
 
-type testing struct {
-	EffectiveDate string
-}
-
 //ReviewRequest is to be exported
 func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
