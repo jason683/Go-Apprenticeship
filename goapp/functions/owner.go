@@ -66,36 +66,36 @@ func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 							if err != nil {
 								fmt.Println(err)
 							}
-							// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'financetax'")
-							// if err != nil {
-							// 	fmt.Println(err)
-							// }
-							// var email string
-							// for emailAddress.Next() {
-							// 	err := emailAddress.Scan(&email)
-							// 	if err != nil {
-							// 		fmt.Println(err)
-							// 	}
-							// 	SendEmail(email)
-							// }
+							emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'financetax'")
+							if err != nil {
+								fmt.Println(err)
+							}
+							var email string
+							for emailAddress.Next() {
+								err := emailAddress.Scan(&email)
+								if err != nil {
+									fmt.Println(err)
+								}
+								SendEmail(email)
+							}
 						} else {
 							actionTime := time.Now().Format(time.RFC3339)
 							_, err := Db.Query("UPDATE Contracts SET ApproveStatus=?, FinanceTax='NA', ActionTime=? WHERE Id=?", contractRequestStatus, actionTime, contractRequestIDstring)
 							if err != nil {
 								fmt.Println(err)
 							}
-							// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'legal'")
-							// if err != nil {
-							// 	fmt.Println(err)
-							// }
-							// var email string
-							// for emailAddress.Next() {
-							// 	err := emailAddress.Scan(&email)
-							// 	if err != nil {
-							// 		fmt.Println(err)
-							// 	}
-							// 	SendEmail(email)
-							// }
+							emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'legal'")
+							if err != nil {
+								fmt.Println(err)
+							}
+							var email string
+							for emailAddress.Next() {
+								err := emailAddress.Scan(&email)
+								if err != nil {
+									fmt.Println(err)
+								}
+								SendEmail(email)
+							}
 						}
 					}
 				}

@@ -295,16 +295,9 @@ func Login(res http.ResponseWriter, req *http.Request) {
 				return
 			}
 		}
-		// fmt.Println(myUser.Username)
-		// fmt.Println("HOHO")
-		// fmt.Println(myUser.Password)
-		// fmt.Println("HEHE")
 		//using bcrypt library to check if the encrypted passwords match
 		err = bcrypt.CompareHashAndPassword(myUser.Password, []byte(password))
 		if err != nil {
-			// fmt.Println("HEYY")
-			// fmt.Println(password)
-			// fmt.Println(myUser.Password)
 			errorMessage["errorUserAndPassword"] = "Username and/or password do not match or are invalid"
 			Tpl.ExecuteTemplate(res, "login.html", errorMessage)
 			delete(errorMessage, "errorUserAndPassword")

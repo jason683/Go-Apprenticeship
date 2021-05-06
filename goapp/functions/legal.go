@@ -75,18 +75,18 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 					}
 				}
 			}
-			// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'contractadmin'")
-			// if err != nil {
-			// 	fmt.Println(err)
-			// }
-			// var email string
-			// for emailAddress.Next() {
-			// 	err := emailAddress.Scan(&email)
-			// 	if err != nil {
-			// 		fmt.Println(err)
-			// 	}
-			// 	SendEmail(email)
-			// }
+			emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Rights = 'contractadmin'")
+			if err != nil {
+				fmt.Println(err)
+			}
+			var email string
+			for emailAddress.Next() {
+				err := emailAddress.Scan(&email)
+				if err != nil {
+					fmt.Println(err)
+				}
+				SendEmail(email)
+			}
 			http.Redirect(res, req, "/directory", http.StatusSeeOther)
 		}
 		Tpl.ExecuteTemplate(res, "draft.html", display)

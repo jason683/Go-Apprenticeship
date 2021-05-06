@@ -81,18 +81,18 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 				fmt.Println(err)
 			}
 
-			// emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Username = ?", businessOwner)
-			// if err != nil {
-			// 	fmt.Println(err)
-			// }
-			// var email string
-			// for emailAddress.Next() {
-			// 	err := emailAddress.Scan(&email)
-			// 	if err != nil {
-			// 		fmt.Println(err)
-			// 	}
-			// }
-			// SendEmail(email)
+			emailAddress, err := Db.Query("SELECT Email FROM Users WHERE Username = ?", businessOwner)
+			if err != nil {
+				fmt.Println(err)
+			}
+			var email string
+			for emailAddress.Next() {
+				err := emailAddress.Scan(&email)
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+			SendEmail(email)
 			relationMap[myUser.Username] = "Yes"
 			http.Redirect(res, req, "/result", http.StatusSeeOther)
 			return
