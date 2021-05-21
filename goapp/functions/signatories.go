@@ -14,7 +14,7 @@ type contract struct {
 	SeniorFinance string
 }
 
-//ShowContracts is to be exported
+//ShowContracts : parts of the function was extracted from https://tutorialedge.net/golang/go-file-upload-tutorial/
 func ShowContracts(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
@@ -22,7 +22,6 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 	}
 	myUser := GetUser(res, req)
 	if myUser.Rights == "signatory" {
-		//to add on new column (signed?)
 		results, err := Db.Query("SELECT Id, Contract, SeniorFinance FROM contracts_db.Contracts WHERE Finalised = 'Pending' AND Contract IS NOT NULL")
 		if err != nil {
 			fmt.Println(err)
@@ -65,7 +64,6 @@ func ShowContracts(res http.ResponseWriter, req *http.Request) {
 			}
 
 			tempFile.Write(fileBytes)
-			//fmt.Fprintf(res, "Successfully Uploaded File\n")
 
 			filepath := tempFile.Name()
 

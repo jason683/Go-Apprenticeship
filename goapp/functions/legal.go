@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-//UploadFile : parts of the function taken from https://tutorialedge.net/golang/go-file-upload-tutorial/
+//UploadFile : parts of the function was extracted from https://tutorialedge.net/golang/go-file-upload-tutorial/
 func UploadFile(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
@@ -61,7 +61,6 @@ func UploadFile(res http.ResponseWriter, req *http.Request) {
 			}
 
 			tempFile.Write(fileBytes)
-			//fmt.Fprintf(res, "Successfully Uploaded File\n")
 
 			filepath := tempFile.Name()
 

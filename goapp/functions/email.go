@@ -28,11 +28,7 @@ func SendEmail(recipient string) {
 	email.AddTo(recipient)
 	email.SetSubject("Notification")
 
-	// byteFile, err := ioutil.ReadFile("templates/email.html")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	random := "testing 123"
+	random := "This is to inform you that you have an outstanding action to be completed on the contract management system. The system link is provided below."
 	b := new(bytes.Buffer)
 	Tpl.ExecuteTemplate(b, "email.html", random) //should insert 3rd argument as myUser for email list
 

@@ -99,20 +99,11 @@ func TestLogin(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expect nil error; got %v", err)
 	}
-	// requestBody, err := json.Marshal(map[string]string{
-	// 	"username": testUser,
-	// 	"password": testPassword,
-	// })
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
 
 	request, err := http.NewRequest("POST", fmt.Sprintf("https://127.0.0.1:5000/login?username=%s&password=%s", testUser, testPassword), nil)
 	if err != nil {
 		t.Error(err)
 	}
-
-	// request.Header.Set("Content-Type", "application/json")
 
 	response := httptest.NewRecorder()
 

@@ -74,9 +74,12 @@ func CreateRequest(res http.ResponseWriter, req *http.Request) {
 			if counterpartyContactInfo == "" {
 				counterpartyContactInfo = "NA"
 			}
+			if others == "" {
+				others = "NA"
+			}
 			timeAction := time.Now().Format(time.RFC3339)
 			//NULL can be used to circumvent the int auto increment in sql
-			_, err := Db.Query("INSERT INTO Contracts (SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Requester, BusinessOwner, ApproveStatus, ActionTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", signingEntity, counterpartyName, business, contractType, contractValue, region, effectiveDate, terminationDate, backgroundPurpose, counterpartyContactInfo, myUser.Username, businessOwner, approveStatus, timeAction)
+			_, err := Db.Query("INSERT INTO Contracts (SigningEntity, CounterpartyName, Business, ContractType, ContractValue, Region, EffectiveDate, TerminationDate, BackgroundPurpose, CounterpartyContactInfo, Other, Requester, BusinessOwner, ApproveStatus, ActionTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", signingEntity, counterpartyName, business, contractType, contractValue, region, effectiveDate, terminationDate, backgroundPurpose, counterpartyContactInfo, others, myUser.Username, businessOwner, approveStatus, timeAction)
 			if err != nil {
 				fmt.Println(err)
 			}
