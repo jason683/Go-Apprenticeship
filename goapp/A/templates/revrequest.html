@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <style>
+    table, th, td { padding-top: 12px; padding-bottom: 12px; text-align: center; background-color: white; color: black; border: 1px solid black; border-collapse: collapse; }
+    p     { display: table-row; }
+    label { display: table-cell; width: 220px; }
+    input { display: table-cell; }
+</style>
+ <title>WELCOME PAGE</title>
+</head>
+<body>
+<h1>Review Contract Request(s)</h1>
+<h2><p><u><b>Table of pending contract requests</h2></b></u></p>
+<table>
+    <tr>
+        <th>Request ID</th>
+        <th>Business Requester</th>
+        <th>Signing Entity</th>
+        <th>Counterparty Name</th>
+        <th>Business</th>
+        <th>Contract Type</th>
+        <th>Contract Value</th>
+        <th>Region</th>
+        <th>Effective Date</th>
+        <th>Termination Date</th>
+        <th>Background/Purpose</th>
+        <th>Counterparty Contact</th>
+    </tr>
+{{range .}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Requester}}</td>
+        <td>{{.SigningEntity}}</td>
+        <td>{{.CounterpartyName}}</td>
+        <td>{{.Business}}</td>
+        <td>{{.ContractType}}</td>
+        <td>{{.ContractValue}}</td>
+        <td>{{.Region}}</td>
+        <td>{{.EffectiveDate}}</td>
+        <td>{{.TerminationDate}}</td>
+        <td>{{.BackgroundPurpose}}</td>
+        <td>{{.CounterpartyContactInfo}}</td>
+    </tr>
+    {{end}}
+</table>
+<br>
+
+<form method="post">
+    <p>
+        <label for ="contractrequestid">Contract Request ID:</label>
+        <select name="contractrequestid">
+            <option disabled selected value="">Enter request ID</option>
+            {{range .}}
+            <option value="{{.ID}}">{{.ID}}</option>
+            {{end}}
+        </select><br>
+    </p>
+    <p>
+        <label for ="approvereject">Select "Approve" or "Reject":</label>
+        <select name="approvereject">
+            <option disabled selected value="">Choose an option</option>
+            <option value="Approve">Approve</option>
+            <option value="Reject">Reject</option>
+        </select><br>
+    </p>
+    <input type="submit">
+</form>
+<h3><a href="/directory">Home page</a><br>
+<a href="/logout">Log Out</a></h3>
+</body>
+</html>

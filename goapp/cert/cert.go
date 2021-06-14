@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+//Cert function has code that is taken from the Go School slides
 //Cert creates a certificate and a private key as part of https security
 func Cert() {
 	max := new(big.Int).Lsh(big.NewInt(1), 128)

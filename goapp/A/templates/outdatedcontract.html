@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <style>
+    table, th, td { padding-top: 12px; padding-bottom: 12px; text-align: center; background-color: white; color: black; border: 1px solid black; border-collapse: collapse; }
+    p     { display: table-row; }
+    label { display: table-cell; width: 220px; }
+    input { display: table-cell; }
+</style>
+ <title>Outdated contract request(s)</title>
+</head>
+<body>
+<h1>Contract(s) status</h1>
+<h2><u>Table of outdated contract request(s)</u></h2>
+<table>
+    <tr>
+        <th>Contract Id</th>
+        <th>Business Owner</th> 
+        <th>Business Owner Approve Status</th> 
+        <th>Contract uploaded by Legal Status</th>  
+        <th>Finance & Tax Approve Status</th>
+        <th>Finalised Status</th>
+        <th>Archived Status</th>
+    </tr>
+    {{range .}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.BusinessOwner}}</td>
+        <td>{{.ApproveStatus}}</td>
+        <td><a href="https://127.0.0.1:5000/readfile?filename={{.Contract}}">{{.Contract}}</a></td>
+        <td>{{.FinanceTax}}</td>
+        <td>{{.Finalised}}</td>
+        <td>{{.Archived}}</td>
+    </tr>
+    {{end}}
+</table><br>
+*Contract request(s) that have a pending status of more than 7 days are deemed to be outdated. Please chase the action owner accordingly.
+<h4><a href="/emaillist">Click here</a> for the list of user emails for you to send a reminder to.</h4>
+<h4>Or <a href="/logout">Log Out.</a></h4>
+
+</body>
+</html>

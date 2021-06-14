@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <style>
+    p     { display: table-row; }
+    label { display: table-cell; width: 100px; }
+    input { display: table-cell; }
+</style>
+ <title>Create Account</title>
+</head>
+<body>
+<h1>Create New Account</h1>
+<p>*Please note that all fields must be completed.</p><br>
+<form method="post">
+    <div>
+        {{ with .input1}}
+        <p>{{ . }}</p>
+        {{ end }}
+    </div>
+    <div>
+        {{ with .input2}}
+        <p>{{ . }}</p>
+        {{ end }}
+    </div>
+    <div>
+        {{ with .input3}}
+        <p>{{ . }}</p>
+        {{ end }}
+    </div>
+    <div>
+        {{ with .input5}}
+        <p>{{ . }}</p>
+        {{ end }}
+    </div>
+    <p>
+        <label for ="username">Username:</label>
+        <input type="text" name="username"><br>
+    </p>
+ <div>
+    {{ with .input4}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<div>
+    {{ with .input6}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<p>
+    <label for ="password">Password:</label>
+    <input type="password" name="password" autocomplete="off"><br>
+</p>
+ <div>
+    {{ with .input7}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<div>
+    {{ with .input9}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<p>
+    <label for ="firstname">First Name:</label>
+    <input type="text" name="firstname"><br>
+</p>
+ <div>
+    {{ with .input8}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<div>
+    {{ with .input10}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<p>
+    <label for ="lastname">Last Name:</label>
+    <input type="text" name="lastname"><br>
+</p>
+ <div>
+    {{ with .input11}}
+    <p>{{ . }}</p>
+    {{ end }}
+</div>
+<p>
+    <label for ="email">Email:</label>
+    <input type="text" name="email"><br>
+</p>
+ <input type="submit">
+</form>
+
+<h2><a href="/">Index Page</a></h2>
+</body>
+</html>

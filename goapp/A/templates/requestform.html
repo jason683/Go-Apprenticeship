@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+    <style type="text/css">
+    form  { display: table;      }
+    p     { display: table-row;  }
+    label { display: table-cell; width: 300px; }
+    input { display: table-cell; }
+    </style>
+ <title>Request Form</title>
+</head>
+<body>
+
+<h1>Contract Request Form</h1>
+<p>*Note that all fields without the optional label must not be empty.</p>
+<p>*Dates must also be in the following format: YYYY-MM-DD.</p>
+<p>*If you have a business type that is not in the dropdown menu, please key in the details in the "other information" field.</p>
+<p>*You may fill in additional details that you wish to highlight in the "other information" field as well.</p><br>
+
+<form method="post">
+    <p>
+        <label for ="signingentity">Signing Entity:</label>
+        <input type="text" name="signingentity"><br>
+    </p>
+    <p>
+        <label for ="counterpartyname">Counterparty Name:</label>
+        <input type="text" name="counterpartyname"><br>
+    </p>
+    <p>
+        <label for ="business">Business Type:</label>
+        <select name="business">
+            <option disabled selected value="">Business</option>
+            <option value="Games & E-Commerce">Games & E-Commerce</option>
+            <option value="Digital Finance">Digital Finance</option>
+        </select>
+    </p>
+    <p>
+        <label for="contracttype">Contract Type:</label>
+        <input type="text" name="contracttype"><br>
+    </p>
+    <p>
+        <label for="contractvalue">Contract Value (optional):</label>
+        <input type="text" name="contractvalue"><br>
+    </p>
+    <div>
+        {{ with .input0}}
+        <p style="color:red">{{ . }}</p>
+        {{ end }}
+    </div>
+    <p>
+        <label for="businessowner">Business Owner (username):</label>
+        <input type="text" name="businessowner"><br>
+    </p>
+    <p>
+        <label for="region">Region (optional):</label>
+        <input type="text" name="region"><br>
+    </p>
+    <p>
+        <label for="effectivedate">Effective Date:</label>
+        <input type="text" name="effectivedate" placeholder="YYYY-MM-DD"><br>
+    </p>
+    <p>
+        <label for="terminationdate">Termination Date:</label>
+        <input type="text" name="terminationdate" placeholder="YYYY-MM-DD"><br>
+    </p>
+    <p>
+        <label for="backgroundpurpose">Background and Purpose (optional):</label>
+        <input type="text" name="backgroundpurpose"><br>
+    </p>
+    <p>
+        <label for="counterpartycontactinfo">Counterparty Contact Information (optional):</label>
+        <input type="text" name="counterpartycontactinfo"><br>
+    </p>
+    <p>
+        <label for="others">Other information (optional):</label>
+        <input type="text" name="others"><br>
+    </p>
+    <div>
+        {{ with .input1}}
+        <p style="color:red">{{ . }}</p>
+        {{ end }}
+    </div>
+    <div>
+        {{ with .nobusiness}}
+        <p style="color:red">{{ . }}</p>
+        {{ end }}
+    </div>
+    <div>
+        {{ with .input2}}
+        <p style="color:red">{{ . }}</p>
+        {{ end }}
+    </div>
+ <input type="submit">
+</form>
+<h3><a href="/logout">Log Out</a></h3>
+</body>
+</html>
