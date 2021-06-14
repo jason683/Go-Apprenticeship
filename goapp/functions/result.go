@@ -2,7 +2,7 @@ package functions
 
 import "net/http"
 
-//Result is to be exported
+//Result allows for the display of an outcome page to be reflected after a user has completed an action.
 func Result(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)

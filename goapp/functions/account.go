@@ -43,9 +43,8 @@ var (
 	Tpl *template.Template
 )
 
-//Start is to be exported
+//Start function will retrieve the staff information and display the information on the webpage
 func Start(res http.ResponseWriter, req *http.Request) {
-	//this will retrieve the Staff information and display it on the webpage
 	myUser := GetUser(res, req)
 	Tpl.ExecuteTemplate(res, "index.html", myUser)
 }
@@ -81,7 +80,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) Staff {
 	return myUser
 }
 
-//Signup is to be exported
+//Signup allows an individual to create an account
 func Signup(res http.ResponseWriter, req *http.Request) {
 	if AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
@@ -258,7 +257,7 @@ func Signup(res http.ResponseWriter, req *http.Request) {
 	Tpl.ExecuteTemplate(res, "signup.html", nil)
 }
 
-//AlreadyLoggedIn is to be exported
+//AlreadyLoggedIn will check whether the user has logged in, and will return a boolean result
 func AlreadyLoggedIn(req *http.Request) bool {
 	//this will request for the http cookie and if there is one already (i.e. the user has an existing session),
 	//the function will return true
@@ -271,7 +270,7 @@ func AlreadyLoggedIn(req *http.Request) bool {
 	return ok
 }
 
-//Login is to be exported
+//Login allows the user to log into the system
 func Login(res http.ResponseWriter, req *http.Request) {
 	if AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
@@ -326,7 +325,7 @@ func Login(res http.ResponseWriter, req *http.Request) {
 	Tpl.ExecuteTemplate(res, "login.html", nil)
 }
 
-//Logout is to be exported
+//Logout deletes the cookie when the user logs out
 func Logout(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)

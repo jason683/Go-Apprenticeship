@@ -14,6 +14,7 @@ type contract struct {
 	SeniorFinance string
 }
 
+//ShowContracts allow the signatory personnel to sign the contract and then upload the file onto the system
 //ShowContracts : parts of the function was extracted from https://tutorialedge.net/golang/go-file-upload-tutorial/
 func ShowContracts(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {

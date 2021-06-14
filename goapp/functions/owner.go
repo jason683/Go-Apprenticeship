@@ -22,7 +22,7 @@ type contractRequest struct {
 	Requester               string
 }
 
-//ReviewRequest is to be exported
+//ReviewRequest allows the business owner to accept or reject the request
 func ReviewRequest(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)

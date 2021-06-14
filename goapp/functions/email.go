@@ -9,7 +9,7 @@ import (
 	mail "github.com/xhit/go-simple-mail/v2"
 )
 
-//SendEmail works on sending email
+//SendEmail is the notification feature whenever a stakeholder has completed an action in the system
 func SendEmail(recipient string) {
 
 	server := mail.NewSMTPClient()

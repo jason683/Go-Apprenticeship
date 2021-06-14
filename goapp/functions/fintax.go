@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-//FinanceTax to be exported
+//FinanceTax allows the finance and tax team to approve or reject the contract request when the request has a monetary value
 func FinanceTax(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)

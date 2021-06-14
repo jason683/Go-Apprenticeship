@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-//Directory to be exported
+//Directory provides various links according to the user's rights
 func Directory(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)

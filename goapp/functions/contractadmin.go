@@ -30,7 +30,7 @@ type row struct {
 	Archived      string
 }
 
-//ValueApproval to be exported
+//ValueApproval allows the contract admin personnel to review the monetary value of a contract and determine if a senior finance personnel has to sign the contract
 func ValueApproval(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
@@ -94,7 +94,7 @@ func ValueApproval(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//ArchiveContract is to be exported
+//ArchiveContract changes the file status in the database to archived.
 func ArchiveContract(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
@@ -140,7 +140,7 @@ func ArchiveContract(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//IdentifyOutdatedRequest is to be exported
+//IdentifyOutdatedRequest allows the contract admin team to chase the relevant action owner.
 func IdentifyOutdatedRequest(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
@@ -234,7 +234,7 @@ func EmailList(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//Test is to be exported
+//Test allows for the viewing of the contracts
 func Test(res http.ResponseWriter, req *http.Request) {
 	params := req.URL.Query()
 	filename := params["filename"]

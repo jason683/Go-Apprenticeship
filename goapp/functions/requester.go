@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-//CreateRequest to be exported
+//CreateRequest allows for the form to be displayed to the business requester
 func CreateRequest(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
 		http.Redirect(res, req, "/", http.StatusSeeOther)

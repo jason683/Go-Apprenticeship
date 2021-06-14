@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+//UploadFile allows the legal team to upload the contract draft
 //UploadFile : parts of the function was extracted from https://tutorialedge.net/golang/go-file-upload-tutorial/
 func UploadFile(res http.ResponseWriter, req *http.Request) {
 	if !AlreadyLoggedIn(req) {
